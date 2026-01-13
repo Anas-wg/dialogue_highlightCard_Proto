@@ -17,7 +17,8 @@ const AVATAR_ROW_HEIGHT = 40;        // 아바타 + 이름 높이 (w-16 + text-l
 const CONV_HEADER_HEIGHT = 56;       // 로고 바 실측
 const CONV_FOOTER_HEIGHT = 72;       // 캐릭터 정보 실측
 const CONV_PADDING = 64;             // 메시지 영역 py-8 = 32px * 2
-const CONV_CONTENT_HEIGHT = CARD_HEIGHT - CONV_HEADER_HEIGHT - CONV_FOOTER_HEIGHT - CONV_PADDING; // ≈ 888px
+const CONV_SAFETY_MARGIN = 80;       // 안전 마진 (오버플로우 방지)
+const CONV_CONTENT_HEIGHT = CARD_HEIGHT - CONV_HEADER_HEIGHT - CONV_FOOTER_HEIGHT - CONV_PADDING - CONV_SAFETY_MARGIN; // ≈ 808px
 
 const CONV_CHARS_PER_LINE = 32;      // 실제 말풍선 너비 기준
 const CONV_LINE_HEIGHT = 28;         // text-xl 실측
@@ -131,9 +132,19 @@ function getVisibleLines(message: ChatMessage, availableHeight: number): number 
 function splitMessageAtLine(msg: ChatMessage, visibleLines: number): { visible: ChatMessage; remaining: ChatMessage | null } {
   const contentLines = msg.content.split('\n');
   const visibleContentLines: string[] = [];
+  const remainingContentLines: string[] = [];
   let currentLineCount = 0;
+  let splitOccurred = false;
 
-  for (const line of contentLines) {
+  for (let i = 0; i < contentLines.length; i++) {
+    const line = contentLines[i];
+
+    if (splitOccurred) {
+      // 이미 분할이 발생했으면 나머지는 모두 remaining으로
+      remainingContentLines.push(line);
+      continue;
+    }
+
     const lineWraps = line.length === 0 ? 1 : Math.ceil(line.length / CONV_CHARS_PER_LINE);
 
     if (currentLineCount + lineWraps <= visibleLines) {
@@ -146,13 +157,22 @@ function splitMessageAtLine(msg: ChatMessage, visibleLines: number): { visible: 
       if (remainingVisibleLines > 0) {
         const visibleChars = remainingVisibleLines * CONV_CHARS_PER_LINE;
         visibleContentLines.push(line.slice(0, visibleChars));
+        // 나머지 글자는 remaining으로
+        const restOfLine = line.slice(visibleChars);
+        if (restOfLine) {
+          remainingContentLines.push(restOfLine);
+        }
+      } else {
+        // 공간이 없으면 전체 줄을 remaining으로
+        remainingContentLines.push(line);
       }
-      break;
+      splitOccurred = true;
+      // 나머지 줄들은 다음 iteration에서 추가됨
     }
   }
 
   const visibleContent = visibleContentLines.join('\n').trim();
-  const remainingContent = msg.content.slice(visibleContent.length).trim();
+  const remainingContent = remainingContentLines.join('\n').trim();
 
   if (!remainingContent) {
     return { visible: msg, remaining: null };
@@ -185,31 +205,62 @@ export function splitMessagesToCards(messages: ChatMessage[]): ChatMessage[][] {
     const height = estimateMessageHeight(message);
 
     // 현재 카드에 추가하면 넘치는 경우
-    if (currentHeight + height > CONV_CONTENT_HEIGHT && currentCard.length > 0) {
-      // 남은 공간 계산
-      const remainingSpace = CONV_CONTENT_HEIGHT - currentHeight;
+    if (currentHeight + height > CONV_CONTENT_HEIGHT) {
+      // 빈 카드인데 메시지가 카드보다 큰 경우 - 무조건 분할 필요
+      if (currentCard.length === 0) {
+        // 카드에 들어갈 수 있는 만큼만 표시
+        const visibleLines = getVisibleLines(message, CONV_CONTENT_HEIGHT);
 
-      // 남은 공간에 일부라도 들어갈 수 있는지 확인
-      const visibleLines = getVisibleLines(message, remainingSpace);
+        if (visibleLines > 0) {
+          const { visible, remaining } = splitMessageAtLine(message, visibleLines);
+          currentCard.push(visible);
+          carryOverMessage = remaining;
+        } else {
+          // 최소 1줄이라도 표시 (edge case 방지)
+          const { visible, remaining } = splitMessageAtLine(message, 1);
+          currentCard.push(visible);
+          carryOverMessage = remaining;
+        }
 
-      if (visibleLines > 0) {
-        // 메시지 분할
-        const { visible, remaining } = splitMessageAtLine(message, visibleLines);
-        currentCard.push(visible);
-        carryOverMessage = remaining;
+        // 현재 카드 완료
+        cards.push(currentCard);
+        currentCard = [];
+        currentHeight = 0;
+
+        // carryOver 메시지가 있으면 같은 인덱스 다시 처리
+        if (carryOverMessage) {
+          i--;
+        }
       } else {
-        // 공간이 없으면 다음 카드로 전체 이동
-        carryOverMessage = message;
-      }
+        // 기존 카드에 추가하면 넘치는 경우
+        // 남은 공간 계산
+        const remainingSpace = CONV_CONTENT_HEIGHT - currentHeight;
 
-      // 현재 카드 완료
-      cards.push(currentCard);
-      currentCard = [];
-      currentHeight = 0;
+        // 남은 공간에 일부라도 들어갈 수 있는지 확인
+        const visibleLines = getVisibleLines(message, remainingSpace);
 
-      // carryOver 메시지가 있으면 같은 인덱스 다시 처리
-      if (carryOverMessage) {
-        i--;
+        // 최소 1줄 이상 보여줄 수 있을 때만 분할
+        const MIN_VISIBLE_LINES = 1;
+
+        if (visibleLines >= MIN_VISIBLE_LINES) {
+          // 메시지 분할
+          const { visible, remaining } = splitMessageAtLine(message, visibleLines);
+          currentCard.push(visible);
+          carryOverMessage = remaining;
+        } else {
+          // 공간이 부족하면 다음 카드로 전체 이동
+          carryOverMessage = message;
+        }
+
+        // 현재 카드 완료
+        cards.push(currentCard);
+        currentCard = [];
+        currentHeight = 0;
+
+        // carryOver 메시지가 있으면 같은 인덱스 다시 처리
+        if (carryOverMessage) {
+          i--;
+        }
       }
     } else {
       // 현재 카드에 추가
