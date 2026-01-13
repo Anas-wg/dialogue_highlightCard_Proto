@@ -8,10 +8,15 @@ interface SentenceShareProps {
   message: ChatMessage;
   avatarUrl?: string;
   onBack: () => void;
+  onNavigateToConversation?: () => void;
 }
 
-export function SentenceShare({ message, avatarUrl, onBack }: SentenceShareProps) {
-  const [activeTab, setActiveTab] = useState<'sentence' | 'conversation'>('sentence');
+export function SentenceShare({ message, avatarUrl, onBack, onNavigateToConversation }: SentenceShareProps) {
+  const handleTabChange = (tab: 'sentence' | 'conversation') => {
+    if (tab === 'conversation' && onNavigateToConversation) {
+      onNavigateToConversation();
+    }
+  };
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
 
   const sentences = message.content.split('\n').filter((s) => s.trim() !== '');
@@ -34,7 +39,7 @@ export function SentenceShare({ message, avatarUrl, onBack }: SentenceShareProps
         onDeselectAll={handleDeselectAll}
       />
 
-      <ShareTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+      <ShareTabBar activeTab="sentence" onTabChange={handleTabChange} />
 
       {/* 안내 텍스트 */}
       <div className="py-8 text-center text-sm text-gray-500">

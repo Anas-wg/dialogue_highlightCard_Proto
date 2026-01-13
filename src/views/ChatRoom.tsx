@@ -9,9 +9,10 @@ import type { ChatRoomData } from '../types/chat';
 interface ChatRoomProps {
   data: ChatRoomData;
   onShareMessage?: (messageId: string) => void;
+  onCreateCard?: () => void;
 }
 
-export function ChatRoom({ data, onShareMessage }: ChatRoomProps) {
+export function ChatRoom({ data, onShareMessage, onCreateCard }: ChatRoomProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBottomModalOpen, setIsBottomModalOpen] = useState(false);
@@ -62,6 +63,7 @@ export function ChatRoom({ data, onShareMessage }: ChatRoomProps) {
       <SideModal
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
+        onCreateCard={onCreateCard}
       />
 
       <BottomModal

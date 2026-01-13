@@ -1,10 +1,16 @@
 interface SideModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onCreateCard?: () => void;
 }
 
-export function SideModal({ isOpen, onClose }: SideModalProps) {
+export function SideModal({ isOpen, onClose, onCreateCard }: SideModalProps) {
   if (!isOpen) return null;
+
+  const handleCreateCard = () => {
+    onClose();
+    onCreateCard?.();
+  };
 
   return (
     <div className="fixed inset-0 z-50">
@@ -23,17 +29,17 @@ export function SideModal({ isOpen, onClose }: SideModalProps) {
           <h2 className="text-sm font-medium text-gray-500 mb-4">채팅방 설정</h2>
 
           <nav className="space-y-1">
-            {/* 대화 하이라이트 카드 공유하기 */}
+            {/* 대화 하이라이트 카드 만들기 */}
             <button
               className="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-100 transition-colors text-left"
-              onClick={() => {}}
+              onClick={handleCreateCard}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                <polyline points="16 6 12 2 8 6" />
-                <line x1="12" y1="2" x2="12" y2="15" />
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
               </svg>
-              <span className="text-gray-800">대화 하이라이트 카드 공유하기</span>
+              <span className="text-gray-800">대화 하이라이트 카드 만들기</span>
             </button>
 
             {/* 채팅방 삭제 */}
