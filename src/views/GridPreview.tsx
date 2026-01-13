@@ -14,29 +14,29 @@ interface GridPreviewProps {
 
 export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: GridPreviewProps) {
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
-  const [scale, setScale] = useState(0.25);
+  const [cardSize, setCardSize] = useState(270);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const { generateImage, downloadImage } = useImageGenerator();
 
-  // 반응형 스케일 계산
+  // 반응형 카드 크기 계산
   useEffect(() => {
-    const calculateScale = () => {
+    const calculateCardSize = () => {
       if (!containerRef.current) return;
       const containerWidth = containerRef.current.clientWidth;
       const gap = 16; // gap-4 = 16px
-      const padding = 32; // px-4 * 2 = 32px
-      const availableWidth = containerWidth - padding;
+      const maxGridWidth = Math.min(containerWidth, 896); // max-w-4xl = 896px
       // 3열 + 2개의 gap
-      const cardWidth = (availableWidth - gap * 2) / 3;
-      const newScale = Math.min(0.35, Math.max(0.15, cardWidth / 1080));
-      setScale(newScale);
+      const newCardSize = Math.floor((maxGridWidth - gap * 2) / 3);
+      setCardSize(Math.min(350, Math.max(100, newCardSize)));
     };
 
-    calculateScale();
-    window.addEventListener('resize', calculateScale);
-    return () => window.removeEventListener('resize', calculateScale);
+    calculateCardSize();
+    window.addEventListener('resize', calculateCardSize);
+    return () => window.removeEventListener('resize', calculateCardSize);
   }, []);
+
+  const scale = cardSize / 1080;
 
   const handleRightClick = (e: React.MouseEvent, index: number) => {
     e.preventDefault();
@@ -100,11 +100,15 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
           {cards.map((card, index) => (
             <div
               key={index}
-              className={`relative cursor-pointer rounded-lg overflow-hidden shadow-md transition-all aspect-square ${
+              className={`relative cursor-pointer rounded-lg overflow-hidden shadow-md transition-all ${
                 selectedIndices.has(index)
                   ? 'ring-4 ring-[#ff2e7f]'
                   : 'hover:shadow-lg'
               }`}
+              style={{
+                width: `${cardSize}px`,
+                height: `${cardSize}px`,
+              }}
               onClick={() => onCardTap(index)}
               onContextMenu={(e) => handleRightClick(e, index)}
             >
