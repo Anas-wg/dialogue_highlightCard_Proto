@@ -116,17 +116,24 @@ export function CarouselPreview({ cards, initialIndex, onBack }: CarouselPreview
           }}
         >
           <div
-            ref={cardRef}
             style={{
               transform: `scale(${scale})`,
               transformOrigin: 'top left',
             }}
           >
-            {currentCard.type === 'sentence' ? (
-              <SentenceCard character={currentCard.character} sentences={currentCard.sentences} />
-            ) : (
-              <ConversationCard character={currentCard.character} messages={currentCard.messages} />
-            )}
+            <div
+              ref={cardRef}
+              style={{
+                width: '1080px',
+                height: '1080px',
+              }}
+            >
+              {currentCard.type === 'sentence' ? (
+                <SentenceCard character={currentCard.character} sentences={currentCard.sentences} />
+              ) : (
+                <ConversationCard character={currentCard.character} messages={currentCard.messages} />
+              )}
+            </div>
           </div>
         </div>
       </div>

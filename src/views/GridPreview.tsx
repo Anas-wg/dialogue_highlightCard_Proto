@@ -90,17 +90,24 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
             >
               {/* 미리보기용 축소 카드 */}
               <div
-                ref={(el) => { cardRefs.current[index] = el; }}
                 style={{
                   transform: `scale(${SCALE})`,
                   transformOrigin: 'top left',
                 }}
               >
-                {card.type === 'sentence' ? (
-                  <SentenceCard character={card.character} sentences={card.sentences} />
-                ) : (
-                  <ConversationCard character={card.character} messages={card.messages} />
-                )}
+                <div
+                  ref={(el) => { cardRefs.current[index] = el; }}
+                  style={{
+                    width: '1080px',
+                    height: '1080px',
+                  }}
+                >
+                  {card.type === 'sentence' ? (
+                    <SentenceCard character={card.character} sentences={card.sentences} />
+                  ) : (
+                    <ConversationCard character={card.character} messages={card.messages} />
+                  )}
+                </div>
               </div>
 
               {/* 선택 체크 표시 */}

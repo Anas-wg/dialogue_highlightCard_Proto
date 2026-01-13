@@ -6,12 +6,14 @@ import type { ChatMessage } from '../types/chat';
 const CARD_HEIGHT = 1080;
 const SENTENCE_HEADER_HEIGHT = 280;  // 로고 + 캐릭터 정보 (이름, 나이, 직업, 해시태그, 한마디)
 const SENTENCE_PADDING = 60;         // 상 40px + 하 20px
-const SENTENCE_CONTENT_HEIGHT = CARD_HEIGHT - SENTENCE_HEADER_HEIGHT - SENTENCE_PADDING; // ≈ 740px
+const SENTENCE_SAFETY_MARGIN = 80;   // 안전 마진 (오버플로우 방지)
+const SENTENCE_CONTENT_HEIGHT = CARD_HEIGHT - SENTENCE_HEADER_HEIGHT - SENTENCE_PADDING - SENTENCE_SAFETY_MARGIN; // ≈ 660px
 
 const CHARS_PER_LINE = 30;           // 한 줄당 글자 수 (text-xl 기준)
 const LINE_HEIGHT = 36;              // 줄 높이 (px, text-xl leading-relaxed)
 const BUBBLE_PADDING = 72;           // 말풍선 패딩 py-5(40px) + mt-2(8px) + 간격
 const AVATAR_ROW_HEIGHT = 40;        // 아바타 + 이름 높이 (w-16 + text-lg)
+const MAX_SENTENCE_CHARS = 350;      // 문장 최대 글자 수 (카드 1장에 들어갈 수 있는 크기)
 
 // ============ ConversationCard 상수 (Design D) ============
 const CONV_HEADER_HEIGHT = 56;       // 로고 바 실측
@@ -34,6 +36,16 @@ const USER_BUBBLE_PADDING = 40;      // py-5 실측
 const USER_TIME_HEIGHT = 20;         // text-sm
 
 /**
+ * 긴 문장을 최대 길이로 자르고 "..." 추가
+ */
+export function truncateSentence(sentence: string): string {
+  if (sentence.length <= MAX_SENTENCE_CHARS) {
+    return sentence;
+  }
+  return sentence.slice(0, MAX_SENTENCE_CHARS).trim() + '...';
+}
+
+/**
  * 단일 문장의 예상 렌더링 높이를 계산
  */
 export function estimateSentenceHeight(sentence: string): number {
@@ -49,15 +61,21 @@ export function estimateSentenceHeight(sentence: string): number {
 export function splitSentencesToCards(sentences: string[]): string[][] {
   if (sentences.length === 0) return [];
 
+  const MAX_SENTENCES_PER_CARD = 4;
   const cards: string[][] = [];
   let currentCard: string[] = [];
   let currentHeight = 0;
 
-  for (const sentence of sentences) {
+  for (const rawSentence of sentences) {
+    // 긴 문장은 잘라서 "..."로 표시
+    const sentence = truncateSentence(rawSentence);
     const height = estimateSentenceHeight(sentence);
 
-    // 현재 카드에 추가하면 넘치는 경우
-    if (currentHeight + height > SENTENCE_CONTENT_HEIGHT && currentCard.length > 0) {
+    // 4문장 도달 또는 높이 초과 시 다음 카드로
+    const wouldOverflow = currentHeight + height > SENTENCE_CONTENT_HEIGHT;
+    const maxSentencesReached = currentCard.length >= MAX_SENTENCES_PER_CARD;
+
+    if ((wouldOverflow || maxSentencesReached) && currentCard.length > 0) {
       // 현재 카드 완료, 새 카드 시작
       cards.push(currentCard);
       currentCard = [sentence];
