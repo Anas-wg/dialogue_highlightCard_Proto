@@ -17,7 +17,7 @@ export function ConversationCard({ character, messages }: ConversationCardProps)
       {/* 상단 로고 바 */}
       <div className="shrink-0 px-10 py-6 border-b border-[#ff2e7f]/10">
         <img
-          src="/figma_view/Loveydovey_logo_real.svg"
+          src="/assets/Loveydovey_logo_real.svg"
           alt="LoveyDovey"
           className="h-8 object-contain"
         />

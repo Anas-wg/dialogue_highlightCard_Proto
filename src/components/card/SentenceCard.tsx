@@ -34,24 +34,39 @@ export function SentenceCard({ character, sentences }: SentenceCardProps) {
             <span className="text-white text-2xl font-semibold">{character.name}</span>
           </div>
           <img
-            src="/figma_view/Loveydovey_logo_real.svg"
+            src="/assets/Loveydovey_logo_real.svg"
             alt="LoveyDovey"
-            className="h-8 object-contain brightness-0 invert"
+            className="h-8 object-contain"
           />
         </div>
 
-        {/* 문장들 - 세로 중앙 정렬 */}
+        {/* 문장들 - 세로 중앙 정렬, 마침표 기준 줄바꿈 */}
         <div className="flex-1 flex flex-col justify-center">
-          <div className="space-y-8">
-            {sentences.map((sentence, index) => (
-              <p
-                key={index}
-                className="text-white text-3xl leading-relaxed font-medium whitespace-pre-wrap"
-                style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
-              >
-                {sentence}
-              </p>
-            ))}
+          <div className="space-y-6">
+            {sentences.flatMap((sentence, sentenceIndex) => {
+              // "캐릭터이름: " 패턴 제거 (대사 표시)
+              let cleanedSentence = sentence.replace(/^[가-힣a-zA-Z_]+:\s*/, '');
+              // 앞뒤 따옴표 제거
+              cleanedSentence = cleanedSentence.replace(/^["']|["']$/g, '');
+
+              // 말줄임표(...) 보호 후 마침표로 분리
+              const ELLIPSIS_PLACEHOLDER = '<<<ELLIPSIS>>>';
+              const protectedSentence = cleanedSentence.replace(/\.\.\./g, ELLIPSIS_PLACEHOLDER);
+              const lines = protectedSentence
+                .split(/(?<=\.)\s*/)
+                .map(s => s.replace(new RegExp(ELLIPSIS_PLACEHOLDER, 'g'), '...').trim())
+                .filter(s => s.length > 0);
+
+              return lines.map((line, lineIndex) => (
+                <p
+                  key={`${sentenceIndex}-${lineIndex}`}
+                  className="text-white text-3xl leading-relaxed font-medium"
+                  style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
+                >
+                  {line}
+                </p>
+              ));
+            })}
           </div>
         </div>
 

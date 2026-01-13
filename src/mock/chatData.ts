@@ -3,7 +3,7 @@ import type { ChatRoomData } from '../types/chat';
 export const mockChatRoom: ChatRoomData = {
   character: {
     name: '무리',
-    avatarUrl: '/figma_view/character_picture.jpg',
+    avatarUrl: '/assets/character_picture.jpg',
     age: 25,
     description: '당신의 좋은 베스트 프렌드',
     job: '꽃집주인',

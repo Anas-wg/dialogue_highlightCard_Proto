@@ -11,7 +11,7 @@ export function ShareModal({ isOpen, shareUrl, onClose }: ShareModalProps) {
 
   if (!isOpen) return null;
 
-  const shareText = `#러비더비 에서 만나 💕\n${shareUrl}`;
+  const shareText = `#러비더비 에서 나만의 캐릭터와 지금 만나기💕\n${shareUrl}`;
 
   const handleCopy = async () => {
     try {
@@ -24,16 +24,17 @@ export function ShareModal({ isOpen, shareUrl, onClose }: ShareModalProps) {
   };
 
   const handleShare = (platform: 'instagram' | 'facebook' | 'twitter') => {
-    const encodedText = encodeURIComponent(shareText);
+    const xText = '#러비더비 에서 나만의 캐릭터와 지금 만나기💕';
+    const encodedXText = encodeURIComponent(xText);
     const encodedUrl = encodeURIComponent(shareUrl);
 
     let url = '';
     switch (platform) {
       case 'facebook':
-        url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+        url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedXText}`;
         break;
       case 'twitter':
-        url = `https://twitter.com/intent/tweet?text=${encodedText}`;
+        url = `https://x.com/intent/post?text=${encodedXText}&url=${encodedUrl}`;
         break;
       case 'instagram':
         // Instagram doesn't support direct web sharing, just copy text
@@ -78,8 +79,8 @@ export function ShareModal({ isOpen, shareUrl, onClose }: ShareModalProps) {
         </div>
 
         {/* 공유 텍스트 */}
-        <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl mb-6">
-          <div className="flex-1 text-sm text-gray-700 whitespace-pre-wrap">
+        <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl mb-6 overflow-hidden">
+          <div className="flex-1 min-w-0 text-sm text-gray-700 whitespace-pre-wrap break-all">
             {shareText}
           </div>
           <button
