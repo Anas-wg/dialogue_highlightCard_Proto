@@ -7,7 +7,7 @@ import { GridPreview } from './views/GridPreview';
 import { CarouselPreview } from './views/CarouselPreview';
 import { ShareModal } from './components/modal/ShareModal';
 import { mockChatRoom } from './mock/chatData';
-import { splitSentencesToCards } from './utils/cardSplitter';
+import { splitSentencesToCards, splitMessagesToCards } from './utils/cardSplitter';
 import type { ChatMessage } from './types/chat';
 import type { CardData } from './types/card';
 
@@ -72,16 +72,20 @@ function App() {
       filteredMessages = filteredMessages.filter((m) => m.sender !== 'user');
     }
 
-    const cardData: CardData = {
+    // 메시지들을 카드별로 분할
+    const splitCards = splitMessagesToCards(filteredMessages);
+
+    // 각 분할된 그룹을 CardData로 변환
+    const cardDataList: CardData[] = splitCards.map((cardMessages) => ({
       type: 'conversation',
       character: {
         name: mockChatRoom.character.name,
         avatarUrl: mockChatRoom.character.avatarUrl,
       },
-      messages: filteredMessages,
-    };
+      messages: cardMessages,
+    }));
 
-    setCards([cardData]);
+    setCards(cardDataList);
     setCurrentScreen('gridPreview');
   };
 

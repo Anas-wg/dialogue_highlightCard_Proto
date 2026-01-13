@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { GridHeader } from '../components/card/GridHeader';
 import { SentenceCard } from '../components/card/SentenceCard';
 import { ConversationCard } from '../components/card/ConversationCard';
@@ -14,34 +14,12 @@ interface GridPreviewProps {
 
 export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: GridPreviewProps) {
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isLongPress = useRef(false);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { generateImage, downloadImage } = useImageGenerator();
 
-  const handleMouseDown = (index: number) => {
-    isLongPress.current = false;
-    longPressTimer.current = setTimeout(() => {
-      isLongPress.current = true;
-      toggleSelection(index);
-    }, 500);
-  };
-
-  const handleMouseUp = (index: number) => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-    if (!isLongPress.current) {
-      onCardTap(index);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
+  const handleRightClick = (e: React.MouseEvent, index: number) => {
+    e.preventDefault();
+    toggleSelection(index);
   };
 
   const toggleSelection = (index: number) => {
@@ -74,14 +52,6 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
     onDownloadComplete();
   };
 
-  useEffect(() => {
-    return () => {
-      if (longPressTimer.current) {
-        clearTimeout(longPressTimer.current);
-      }
-    };
-  }, []);
-
   // 스케일 비율 (1080px -> 미리보기 크기)
   const SCALE = 0.25;
 
@@ -101,8 +71,8 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
       </div>
 
       {/* 그리드 */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4">
-        <div className="grid grid-cols-3 gap-4">
+      <div className="flex-1 overflow-y-auto mt-4 px-4 pb-4">
+        <div className="grid grid-cols-3 gap-4 pt-1">
           {cards.map((card, index) => (
             <div
               key={index}
@@ -115,11 +85,8 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
                 width: `${1080 * SCALE}px`,
                 height: `${1080 * SCALE}px`,
               }}
-              onMouseDown={() => handleMouseDown(index)}
-              onMouseUp={() => handleMouseUp(index)}
-              onMouseLeave={handleMouseLeave}
-              onTouchStart={() => handleMouseDown(index)}
-              onTouchEnd={() => handleMouseUp(index)}
+              onClick={() => onCardTap(index)}
+              onContextMenu={(e) => handleRightClick(e, index)}
             >
               {/* 미리보기용 축소 카드 */}
               <div

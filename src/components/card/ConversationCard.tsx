@@ -1,3 +1,4 @@
+// 대화 공유 카드 - Design D (심플 모던 핑크)
 import type { ChatMessage } from '../../types/chat';
 
 interface ConversationCardProps {
@@ -12,61 +13,37 @@ function formatTime(timestamp: string): string {
 
 export function ConversationCard({ character, messages }: ConversationCardProps) {
   return (
-    <div
-      className="w-[1080px] min-h-[1080px] p-8 flex flex-col"
-      style={{
-        background: 'linear-gradient(135deg, #ffd5e5 0%, #ffffff 100%)',
-      }}
-    >
-      {/* 헤더: 아바타 + 이름 + 로고 */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-            {character.avatarUrl ? (
-              <img
-                src={character.avatarUrl}
-                alt={character.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
-                {character.name[0]}
-              </div>
-            )}
-          </div>
-          <span className="font-medium text-gray-800">{character.name}</span>
-        </div>
-
-        {/* 로고 */}
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-[#ff2e7f] flex items-center justify-center">
-            <span className="text-white text-xs">L</span>
-          </div>
-          <span className="text-[#ff2e7f] font-medium">LoveyDovey</span>
-        </div>
+    <div className="w-[1080px] h-[1080px] bg-[#fff8fa] flex flex-col overflow-hidden">
+      {/* 상단 로고 바 */}
+      <div className="shrink-0 px-10 py-6 border-b border-[#ff2e7f]/10">
+        <img
+          src="/figma_view/Loveydovey_logo_real.svg"
+          alt="LoveyDovey"
+          className="h-8 object-contain"
+        />
       </div>
 
-      {/* 메시지 목록 */}
-      <div className="flex-1 space-y-4">
+      {/* 메시지 영역 */}
+      <div className="flex-1 px-12 py-8 space-y-8 overflow-hidden">
         {messages.map((message) => {
           const isUser = message.sender === 'user';
           const isCharacter = message.sender === 'character';
 
           if (isUser) {
             return (
-              <div key={message.id} className="flex flex-col items-end gap-1">
-                <div className="max-w-[70%] px-4 py-3 rounded-2xl rounded-br-sm bg-[#ff2e7f]/20">
-                  <p className="whitespace-pre-wrap text-gray-800 text-sm">{message.content}</p>
+              <div key={message.id} className="flex flex-col items-end gap-2">
+                <div className="max-w-[55%] px-7 py-5 rounded-2xl bg-[#ff2e7f]">
+                  <p className="whitespace-pre-wrap text-white text-xl leading-relaxed">{message.content}</p>
                 </div>
-                <span className="text-xs text-gray-400">{formatTime(message.timestamp)}</span>
+                <span className="text-sm text-[#ff2e7f]/40 mr-2">{formatTime(message.timestamp)}</span>
               </div>
             );
           }
 
           if (isCharacter) {
             return (
-              <div key={message.id} className="flex gap-3">
-                <div className="shrink-0 w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+              <div key={message.id} className="flex gap-5">
+                <div className="shrink-0 w-14 h-14 rounded-full overflow-hidden border-2 border-[#ff2e7f]/20">
                   {character.avatarUrl ? (
                     <img
                       src={character.avatarUrl}
@@ -74,20 +51,20 @@ export function ConversationCard({ character, messages }: ConversationCardProps)
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                    <div className="w-full h-full bg-white flex items-center justify-center text-[#ff2e7f] text-xl font-medium">
                       {character.name[0]}
                     </div>
                   )}
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-gray-700">{message.senderName}</span>
-                  <div className="mt-1 max-w-[85%] px-4 py-3 bg-white rounded-2xl rounded-tl-sm shadow-sm">
-                    <p className="text-gray-800 whitespace-pre-wrap text-sm leading-relaxed">
+                  <span className="text-lg font-medium text-[#ff2e7f]">{message.senderName}</span>
+                  <div className="mt-2 max-w-[70%] px-7 py-5 bg-white rounded-2xl border border-[#ff2e7f]/10">
+                    <p className="text-gray-700 whitespace-pre-wrap text-xl leading-relaxed">
                       {message.content}
                     </p>
                   </div>
-                  <div className="mt-1 text-xs text-gray-400">{formatTime(message.timestamp)}</div>
+                  <div className="mt-2 text-sm text-[#ff2e7f]/40">{formatTime(message.timestamp)}</div>
                 </div>
               </div>
             );
@@ -95,6 +72,32 @@ export function ConversationCard({ character, messages }: ConversationCardProps)
 
           return null;
         })}
+      </div>
+
+      {/* 하단 캐릭터 정보 */}
+      <div className="shrink-0 px-10 py-6 border-t border-[#ff2e7f]/10 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#ff2e7f]/20">
+            {character.avatarUrl ? (
+              <img
+                src={character.avatarUrl}
+                alt={character.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-white flex items-center justify-center text-[#ff2e7f] font-medium">
+                {character.name[0]}
+              </div>
+            )}
+          </div>
+          <div>
+            <p className="font-semibold text-[#ff2e7f]">{character.name}</p>
+            <p className="text-sm text-[#ff2e7f]/50">LoveyDovey Character</p>
+          </div>
+        </div>
+        <div className="text-[#ff2e7f]/60 text-sm font-medium">
+          @lovey_dovey
+        </div>
       </div>
     </div>
   );

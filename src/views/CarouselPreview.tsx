@@ -55,6 +55,20 @@ export function CarouselPreview({ cards, initialIndex, onBack }: CarouselPreview
     return () => window.removeEventListener('resize', calculateScale);
   }, []);
 
+  // 키보드 방향키 네비게이션
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        setCurrentIndex((prev) => Math.max(0, prev - 1));
+      } else if (e.key === 'ArrowRight') {
+        setCurrentIndex((prev) => Math.min(cards.length - 1, prev + 1));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [cards.length]);
+
   const goToPrev = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);

@@ -1,15 +1,36 @@
 // 카드 분할 로직 - 추정 높이 기반
 
-// 상수 정의
-const CARD_HEIGHT = 1080;
-const HEADER_HEIGHT = 280;      // 로고 + 캐릭터 정보 (이름, 나이, 직업, 해시태그, 한마디)
-const PADDING = 80;             // 상하 패딩
-const CONTENT_HEIGHT = CARD_HEIGHT - HEADER_HEIGHT - PADDING; // ≈ 720px
+import type { ChatMessage } from '../types/chat';
 
-const CHARS_PER_LINE = 35;      // 한 줄당 글자 수 (큰 폰트 기준)
-const LINE_HEIGHT = 32;         // 줄 높이 (px)
-const BUBBLE_PADDING = 56;      // 말풍선 패딩 + 마진
-const AVATAR_ROW_HEIGHT = 32;   // 아바타 + 이름 높이
+// ============ SentenceCard 상수 ============
+const CARD_HEIGHT = 1080;
+const SENTENCE_HEADER_HEIGHT = 280;  // 로고 + 캐릭터 정보 (이름, 나이, 직업, 해시태그, 한마디)
+const SENTENCE_PADDING = 60;         // 상 40px + 하 20px
+const SENTENCE_CONTENT_HEIGHT = CARD_HEIGHT - SENTENCE_HEADER_HEIGHT - SENTENCE_PADDING; // ≈ 740px
+
+const CHARS_PER_LINE = 30;           // 한 줄당 글자 수 (text-xl 기준)
+const LINE_HEIGHT = 36;              // 줄 높이 (px, text-xl leading-relaxed)
+const BUBBLE_PADDING = 72;           // 말풍선 패딩 py-5(40px) + mt-2(8px) + 간격
+const AVATAR_ROW_HEIGHT = 40;        // 아바타 + 이름 높이 (w-16 + text-lg)
+
+// ============ ConversationCard 상수 (Design D) ============
+const CONV_HEADER_HEIGHT = 56;       // 로고 바 실측
+const CONV_FOOTER_HEIGHT = 72;       // 캐릭터 정보 실측
+const CONV_PADDING = 64;             // 메시지 영역 py-8 = 32px * 2
+const CONV_CONTENT_HEIGHT = CARD_HEIGHT - CONV_HEADER_HEIGHT - CONV_FOOTER_HEIGHT - CONV_PADDING; // ≈ 888px
+
+const CONV_CHARS_PER_LINE = 32;      // 실제 말풍선 너비 기준
+const CONV_LINE_HEIGHT = 28;         // text-xl 실측
+const CONV_MESSAGE_GAP = 32;         // space-y-8
+
+// 캐릭터 메시지 상수
+const CHAR_NAME_HEIGHT = 24;         // text-lg 실측
+const CHAR_BUBBLE_PADDING = 40;      // py-5 실측
+const CHAR_TIME_HEIGHT = 24;         // text-sm + mt-2
+
+// 사용자 메시지 상수
+const USER_BUBBLE_PADDING = 40;      // py-5 실측
+const USER_TIME_HEIGHT = 20;         // text-sm
 
 /**
  * 단일 문장의 예상 렌더링 높이를 계산
@@ -35,7 +56,7 @@ export function splitSentencesToCards(sentences: string[]): string[][] {
     const height = estimateSentenceHeight(sentence);
 
     // 현재 카드에 추가하면 넘치는 경우
-    if (currentHeight + height > CONTENT_HEIGHT && currentCard.length > 0) {
+    if (currentHeight + height > SENTENCE_CONTENT_HEIGHT && currentCard.length > 0) {
       // 현재 카드 완료, 새 카드 시작
       cards.push(currentCard);
       currentCard = [sentence];
@@ -43,6 +64,156 @@ export function splitSentencesToCards(sentences: string[]): string[][] {
     } else {
       // 현재 카드에 추가
       currentCard.push(sentence);
+      currentHeight += height;
+    }
+  }
+
+  // 마지막 카드 추가
+  if (currentCard.length > 0) {
+    cards.push(currentCard);
+  }
+
+  return cards;
+}
+
+/**
+ * 텍스트의 실제 라인 수 계산 (줄바꿈 + 자동 줄바꿈 고려)
+ */
+function countActualLines(content: string): number {
+  const lines = content.split('\n');
+  let totalLines = 0;
+
+  for (const line of lines) {
+    if (line.length === 0) {
+      totalLines += 1; // 빈 줄도 1줄로 계산
+    } else {
+      // 각 줄이 자동 줄바꿈되는 횟수 계산
+      totalLines += Math.ceil(line.length / CONV_CHARS_PER_LINE);
+    }
+  }
+
+  return totalLines;
+}
+
+/**
+ * 단일 메시지의 예상 렌더링 높이를 계산
+ */
+export function estimateMessageHeight(message: ChatMessage): number {
+  const lines = countActualLines(message.content);
+  const textHeight = lines * CONV_LINE_HEIGHT;
+
+  if (message.sender === 'user') {
+    // 사용자 메시지: 말풍선 + 시간 + 간격
+    return textHeight + USER_BUBBLE_PADDING + USER_TIME_HEIGHT + CONV_MESSAGE_GAP;
+  } else {
+    // 캐릭터 메시지: 이름 + 말풍선 + 시간 + 간격
+    return CHAR_NAME_HEIGHT + textHeight + CHAR_BUBBLE_PADDING + CHAR_TIME_HEIGHT + CONV_MESSAGE_GAP;
+  }
+}
+
+/**
+ * 메시지의 보이는 줄 수 계산
+ */
+function getVisibleLines(message: ChatMessage, availableHeight: number): number {
+  const baseHeight = message.sender === 'user'
+    ? USER_BUBBLE_PADDING + USER_TIME_HEIGHT + CONV_MESSAGE_GAP
+    : CHAR_NAME_HEIGHT + CHAR_BUBBLE_PADDING + CHAR_TIME_HEIGHT + CONV_MESSAGE_GAP;
+
+  const textAvailableHeight = availableHeight - baseHeight;
+  if (textAvailableHeight <= 0) return 0;
+
+  return Math.floor(textAvailableHeight / CONV_LINE_HEIGHT);
+}
+
+/**
+ * 메시지를 특정 줄에서 분할 (실제 라인 기준)
+ */
+function splitMessageAtLine(msg: ChatMessage, visibleLines: number): { visible: ChatMessage; remaining: ChatMessage | null } {
+  const contentLines = msg.content.split('\n');
+  const visibleContentLines: string[] = [];
+  let currentLineCount = 0;
+
+  for (const line of contentLines) {
+    const lineWraps = line.length === 0 ? 1 : Math.ceil(line.length / CONV_CHARS_PER_LINE);
+
+    if (currentLineCount + lineWraps <= visibleLines) {
+      // 이 줄 전체가 보임
+      visibleContentLines.push(line);
+      currentLineCount += lineWraps;
+    } else {
+      // 이 줄에서 일부만 보임 - 글자 수로 분할
+      const remainingVisibleLines = visibleLines - currentLineCount;
+      if (remainingVisibleLines > 0) {
+        const visibleChars = remainingVisibleLines * CONV_CHARS_PER_LINE;
+        visibleContentLines.push(line.slice(0, visibleChars));
+      }
+      break;
+    }
+  }
+
+  const visibleContent = visibleContentLines.join('\n').trim();
+  const remainingContent = msg.content.slice(visibleContent.length).trim();
+
+  if (!remainingContent) {
+    return { visible: msg, remaining: null };
+  }
+
+  return {
+    visible: { ...msg, content: visibleContent },
+    remaining: { ...msg, content: remainingContent, id: `${msg.id}_cont` }
+  };
+}
+
+/**
+ * 메시지 배열을 카드별로 분할
+ * 잘린 메시지는 다음 카드에서 이어서 계속
+ * @param messages 전체 메시지 배열
+ * @returns 카드별 메시지 배열 (2차원 배열)
+ */
+export function splitMessagesToCards(messages: ChatMessage[]): ChatMessage[][] {
+  if (messages.length === 0) return [];
+
+  const cards: ChatMessage[][] = [];
+  let currentCard: ChatMessage[] = [];
+  let currentHeight = 0;
+  let carryOverMessage: ChatMessage | null = null; // 다음 카드로 이어질 메시지
+
+  for (let i = 0; i < messages.length; i++) {
+    const message: ChatMessage = carryOverMessage ?? messages[i];
+    carryOverMessage = null;
+
+    const height = estimateMessageHeight(message);
+
+    // 현재 카드에 추가하면 넘치는 경우
+    if (currentHeight + height > CONV_CONTENT_HEIGHT && currentCard.length > 0) {
+      // 남은 공간 계산
+      const remainingSpace = CONV_CONTENT_HEIGHT - currentHeight;
+
+      // 남은 공간에 일부라도 들어갈 수 있는지 확인
+      const visibleLines = getVisibleLines(message, remainingSpace);
+
+      if (visibleLines > 0) {
+        // 메시지 분할
+        const { visible, remaining } = splitMessageAtLine(message, visibleLines);
+        currentCard.push(visible);
+        carryOverMessage = remaining;
+      } else {
+        // 공간이 없으면 다음 카드로 전체 이동
+        carryOverMessage = message;
+      }
+
+      // 현재 카드 완료
+      cards.push(currentCard);
+      currentCard = [];
+      currentHeight = 0;
+
+      // carryOver 메시지가 있으면 같은 인덱스 다시 처리
+      if (carryOverMessage) {
+        i--;
+      }
+    } else {
+      // 현재 카드에 추가
+      currentCard.push(message);
       currentHeight += height;
     }
   }
@@ -68,5 +239,5 @@ export function estimateCardHeight(sentences: string[]): number {
     contentHeight += estimateSentenceHeight(sentence);
   }
 
-  return HEADER_HEIGHT + PADDING + contentHeight;
+  return SENTENCE_HEADER_HEIGHT + SENTENCE_PADDING + contentHeight;
 }
