@@ -88,8 +88,9 @@ export function ConversationShare({
   const isSelectionComplete = startIndex !== null && endIndex !== null;
 
   return (
-    <div className="flex flex-col h-screen bg-[#fdf6f6]">
-      <ConversationShareHeader
+    <div className="h-screen bg-white">
+      <div className="flex flex-col h-full max-w-[80%] mx-auto bg-[#fdf6f6]">
+        <ConversationShareHeader
         selectedCount={selectedCount}
         onBack={onBack}
         onSelectAll={handleSelectAll}
@@ -145,6 +146,7 @@ export function ConversationShare({
         >
           선택 완료
         </button>
+        </div>
       </div>
     </div>
   );

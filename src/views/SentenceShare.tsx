@@ -40,8 +40,9 @@ export function SentenceShare({ message, avatarUrl, onBack, onNavigateToConversa
   const isSelectionComplete = selectedIndices.size > 0;
 
   return (
-    <div className="flex flex-col h-screen bg-[#fdf6f6]">
-      <SentenceShareHeader
+    <div className="h-screen bg-white">
+      <div className="flex flex-col h-full max-w-[80%] mx-auto bg-[#fdf6f6]">
+        <SentenceShareHeader
         selectedCount={selectedIndices.size}
         onBack={onBack}
         onSelectAll={handleSelectAll}
@@ -55,7 +56,7 @@ export function SentenceShare({ message, avatarUrl, onBack, onNavigateToConversa
         <p>***</p>
         <p className="mt-2 font-medium text-gray-700">말풍선 안에서 공유하고 싶은 문장을 클릭하세요.</p>
         <p className="mt-1">전체 문장을 공유하고 싶다면, 우측 상단 전체 선택 버튼을 눌러주세요.</p>
-        <p>다른 말풍선 내용도 공유하고 싶다면, 말풍선 공유하기 버튼을 눌러주세요</p>
+        <p>다른 말풍선 내용도 공유하고 싶다면, <span className="font-bold">상단의 대화 공유하기</span> 를 눌러주세요</p>
         <p className="mt-2">***</p>
       </div>
 
@@ -82,6 +83,7 @@ export function SentenceShare({ message, avatarUrl, onBack, onNavigateToConversa
         >
           선택 완료
         </button>
+        </div>
       </div>
     </div>
   );

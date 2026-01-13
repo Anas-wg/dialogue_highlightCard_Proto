@@ -106,8 +106,9 @@ export function CarouselPreview({ cards, initialIndex, onBack }: CarouselPreview
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      <CarouselHeader
+    <div className="h-screen bg-white">
+      <div className="flex flex-col h-full max-w-[80%] mx-auto bg-white">
+        <CarouselHeader
         currentIndex={currentIndex}
         totalCount={cards.length}
         onBack={onBack}
@@ -203,7 +204,7 @@ export function CarouselPreview({ cards, initialIndex, onBack }: CarouselPreview
         {/* Download */}
         <button
           onClick={handleDownload}
-          className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-[#ff2e7f] hover:bg-gray-200 transition-colors"
+          className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#ff2e7f] hover:bg-gray-200 transition-colors"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -211,6 +212,7 @@ export function CarouselPreview({ cards, initialIndex, onBack }: CarouselPreview
             <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
         </button>
+        </div>
       </div>
     </div>
   );

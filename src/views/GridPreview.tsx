@@ -74,8 +74,9 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#fdf6f6]">
-      <GridHeader
+    <div className="h-screen bg-white">
+      <div className="flex flex-col h-full max-w-[80%] mx-auto bg-[#fdf6f6]">
+        <GridHeader
         selectedCount={selectedIndices.size}
         onBack={onBack}
         onDownload={handleDownload}
@@ -86,7 +87,7 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
         <p className="text-[#ff2e7f] font-medium">
           생성된 전체 대화 하이라이트 카드를 확인하세요
         </p>
-        <p className="text-gray-500 text-sm mt-1">
+        <p className="text-[#ff2e7f]/70 text-sm mt-1">
           우클릭으로 다운로드할 사진을 선택할 수 있습니다.
         </p>
       </div>
@@ -144,6 +145,7 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
               )}
             </div>
           ))}
+        </div>
         </div>
       </div>
     </div>

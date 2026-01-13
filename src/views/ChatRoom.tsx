@@ -36,17 +36,18 @@ export function ChatRoom({ data, onShareMessage, onCreateCard }: ChatRoomProps) 
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#fdf6f6]">
-      <ChatHeader
-        characterName={data.character.name}
-        coins={data.coins}
-        onMenu={() => setIsMenuOpen(true)}
-      />
+    <div className="h-screen bg-white">
+      <div className="flex flex-col h-full max-w-[80%] mx-auto bg-[#fdf6f6]">
+        <ChatHeader
+          characterName={data.character.name}
+          coins={data.coins}
+          onMenu={() => setIsMenuOpen(true)}
+        />
 
-      <AffinityBar affinity={data.affinity} />
+        <AffinityBar affinity={data.affinity} />
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="py-4">
+        <div className="flex-1 overflow-y-auto">
+          <div className="py-4">
           {data.messages.map((message) => (
             <ChatMessage
               key={message.id}
@@ -74,6 +75,7 @@ export function ChatRoom({ data, onShareMessage, onCreateCard }: ChatRoomProps) 
         }}
         onShare={handleShare}
       />
+      </div>
     </div>
   );
 }

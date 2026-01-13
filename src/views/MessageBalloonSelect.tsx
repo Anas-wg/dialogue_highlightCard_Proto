@@ -25,8 +25,9 @@ export function MessageBalloonSelect({
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#fdf6f6]">
-      <MessageBalloonSelectHeader onBack={onBack} />
+    <div className="h-screen bg-white">
+      <div className="flex flex-col h-full max-w-[80%] mx-auto bg-[#fdf6f6]">
+        <MessageBalloonSelectHeader onBack={onBack} />
 
       <ShareTabBar activeTab="sentence" onTabChange={handleTabChange} />
 
@@ -44,6 +45,7 @@ export function MessageBalloonSelect({
           avatarUrl={avatarUrl}
           onMessageClick={onSelectMessage}
         />
+        </div>
       </div>
     </div>
   );
