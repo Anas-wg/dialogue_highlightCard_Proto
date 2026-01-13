@@ -1,0 +1,137 @@
+import { useState } from 'react';
+
+interface ShareModalProps {
+  isOpen: boolean;
+  shareUrl: string;
+  onClose: () => void;
+}
+
+export function ShareModal({ isOpen, shareUrl, onClose }: ShareModalProps) {
+  const [copied, setCopied] = useState(false);
+
+  if (!isOpen) return null;
+
+  const shareText = `#러비더비 에서 만나 💕\n${shareUrl}`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      console.error('Failed to copy');
+    }
+  };
+
+  const handleShare = (platform: 'instagram' | 'facebook' | 'twitter') => {
+    const encodedText = encodeURIComponent(shareText);
+    const encodedUrl = encodeURIComponent(shareUrl);
+
+    let url = '';
+    switch (platform) {
+      case 'facebook':
+        url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+        break;
+      case 'twitter':
+        url = `https://twitter.com/intent/tweet?text=${encodedText}`;
+        break;
+      case 'instagram':
+        // Instagram doesn't support direct web sharing, just copy text
+        handleCopy();
+        return;
+    }
+
+    if (url) {
+      window.open(url, '_blank', 'width=600,height=400');
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+
+      {/* Modal */}
+      <div className="relative bg-white rounded-2xl w-[90%] max-w-md p-6 shadow-xl">
+        {/* 닫기 버튼 */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
+        {/* 완료 메시지 */}
+        <div className="text-center mb-6">
+          <p className="text-[#ff2e7f] font-bold text-lg">
+            선택하신 이미지의 다운로드가 완료되었습니다
+          </p>
+          <p className="text-[#ff2e7f] mt-2">
+            아래 텍스트를 복사 붙여넣기 한 후
+          </p>
+          <p className="text-[#ff2e7f]">
+            SNS에 대화 하이라이트 카드를 공유하세요!
+          </p>
+        </div>
+
+        {/* 공유 텍스트 */}
+        <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl mb-6">
+          <div className="flex-1 text-sm text-gray-700 whitespace-pre-wrap">
+            {shareText}
+          </div>
+          <button
+            onClick={handleCopy}
+            className="shrink-0 p-2 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            {copied ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff2e7f" strokeWidth="2">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            )}
+          </button>
+        </div>
+
+        {/* SNS 버튼 */}
+        <div className="flex items-center justify-center gap-4">
+          {/* Instagram */}
+          <button
+            onClick={() => handleShare('instagram')}
+            className="w-12 h-12 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 flex items-center justify-center text-white"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </button>
+
+          {/* Facebook */}
+          <button
+            onClick={() => handleShare('facebook')}
+            className="w-12 h-12 rounded-full bg-[#1877f2] flex items-center justify-center text-white"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </button>
+
+          {/* X (Twitter) */}
+          <button
+            onClick={() => handleShare('twitter')}
+            className="w-12 h-12 rounded-full bg-black flex items-center justify-center text-white"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

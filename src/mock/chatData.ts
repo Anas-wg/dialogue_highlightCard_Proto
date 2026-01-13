@@ -4,6 +4,12 @@ export const mockChatRoom: ChatRoomData = {
   character: {
     name: '무리',
     avatarUrl: undefined,
+    age: 25,
+    description: '당신의 좋은 베스트 프렌드',
+    job: '꽃집주인',
+    hashtags: ['츤데레', '해시태그'],
+    quote: '..... 전화 끊어도 될까요? 게임하고 싶어요',
+    shareUrl: 'https://www.loveydovey.ai/characters/sVeHSJEeTbfoT9kAPbkn',
   },
   userId: 'user_70317',
   affinity: {

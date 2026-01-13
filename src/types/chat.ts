@@ -9,6 +9,12 @@ export interface ChatMessage {
 export interface CharacterInfo {
   name: string;
   avatarUrl?: string;
+  age?: number;
+  description?: string;
+  job?: string;
+  hashtags?: string[];
+  quote?: string;
+  shareUrl?: string;
 }
 
 export interface AffinityInfo {
