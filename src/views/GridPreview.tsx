@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { GridHeader } from '../components/card/GridHeader';
 import { SentenceCard } from '../components/card/SentenceCard';
 import { ConversationCard } from '../components/card/ConversationCard';
@@ -14,8 +14,29 @@ interface GridPreviewProps {
 
 export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: GridPreviewProps) {
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
+  const [scale, setScale] = useState(0.25);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { generateImage, downloadImage } = useImageGenerator();
+
+  // 반응형 스케일 계산
+  useEffect(() => {
+    const calculateScale = () => {
+      if (!containerRef.current) return;
+      const containerWidth = containerRef.current.clientWidth;
+      const gap = 16; // gap-4 = 16px
+      const padding = 32; // px-4 * 2 = 32px
+      const availableWidth = containerWidth - padding;
+      // 3열 + 2개의 gap
+      const cardWidth = (availableWidth - gap * 2) / 3;
+      const newScale = Math.min(0.35, Math.max(0.15, cardWidth / 1080));
+      setScale(newScale);
+    };
+
+    calculateScale();
+    window.addEventListener('resize', calculateScale);
+    return () => window.removeEventListener('resize', calculateScale);
+  }, []);
 
   const handleRightClick = (e: React.MouseEvent, index: number) => {
     e.preventDefault();
@@ -52,9 +73,6 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
     onDownloadComplete();
   };
 
-  // 스케일 비율 (1080px -> 미리보기 크기)
-  const SCALE = 0.25;
-
   return (
     <div className="flex flex-col h-screen bg-[#fdf6f6]">
       <GridHeader
@@ -68,30 +86,32 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
         <p className="text-[#ff2e7f] font-medium">
           생성된 전체 대화 하이라이트 카드를 확인하세요
         </p>
+        <p className="text-gray-500 text-sm mt-1">
+          우클릭으로 다운로드할 사진을 선택할 수 있습니다.
+        </p>
       </div>
 
       {/* 그리드 */}
-      <div className="flex-1 overflow-y-auto mt-4 px-4 pb-4">
-        <div className="grid grid-cols-3 gap-4 pt-1">
+      <div
+        ref={containerRef}
+        className="flex-1 overflow-y-auto mt-4 px-4 pb-4"
+      >
+        <div className="grid grid-cols-3 gap-4 pt-1 max-w-4xl mx-auto">
           {cards.map((card, index) => (
             <div
               key={index}
-              className={`relative cursor-pointer rounded-lg overflow-hidden shadow-md transition-all ${
+              className={`relative cursor-pointer rounded-lg overflow-hidden shadow-md transition-all aspect-square ${
                 selectedIndices.has(index)
                   ? 'ring-4 ring-[#ff2e7f]'
                   : 'hover:shadow-lg'
               }`}
-              style={{
-                width: `${1080 * SCALE}px`,
-                height: `${1080 * SCALE}px`,
-              }}
               onClick={() => onCardTap(index)}
               onContextMenu={(e) => handleRightClick(e, index)}
             >
               {/* 미리보기용 축소 카드 */}
               <div
                 style={{
-                  transform: `scale(${SCALE})`,
+                  transform: `scale(${scale})`,
                   transformOrigin: 'top left',
                 }}
               >
