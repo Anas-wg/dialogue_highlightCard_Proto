@@ -9,6 +9,7 @@ interface ConversationShareProps {
   avatarUrl?: string;
   onBack: () => void;
   onComplete: (startIndex: number, endIndex: number, hideMyMessages: boolean) => void;
+  onNavigateToSentence?: () => void;
 }
 
 export function ConversationShare({
@@ -16,8 +17,17 @@ export function ConversationShare({
   avatarUrl,
   onBack,
   onComplete,
+  onNavigateToSentence,
 }: ConversationShareProps) {
   const [activeTab, setActiveTab] = useState<'sentence' | 'conversation'>('conversation');
+
+  const handleTabChange = (tab: 'sentence' | 'conversation') => {
+    if (tab === 'sentence' && onNavigateToSentence) {
+      onNavigateToSentence();
+    } else {
+      setActiveTab(tab);
+    }
+  };
   const [startIndex, setStartIndex] = useState<number | null>(null);
   const [endIndex, setEndIndex] = useState<number | null>(null);
   const [hideMyMessages, setHideMyMessages] = useState(false);
@@ -86,7 +96,7 @@ export function ConversationShare({
         onDeselectAll={handleDeselectAll}
       />
 
-      <ShareTabBar activeTab={activeTab} onTabChange={setActiveTab} />
+      <ShareTabBar activeTab={activeTab} onTabChange={handleTabChange} />
 
       {/* 내 대사 가리기 옵션 */}
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100">

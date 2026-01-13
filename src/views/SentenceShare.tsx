@@ -9,9 +9,10 @@ interface SentenceShareProps {
   avatarUrl?: string;
   onBack: () => void;
   onNavigateToConversation?: () => void;
+  onComplete?: (selectedIndices: number[]) => void;
 }
 
-export function SentenceShare({ message, avatarUrl, onBack, onNavigateToConversation }: SentenceShareProps) {
+export function SentenceShare({ message, avatarUrl, onBack, onNavigateToConversation, onComplete }: SentenceShareProps) {
   const handleTabChange = (tab: 'sentence' | 'conversation') => {
     if (tab === 'conversation' && onNavigateToConversation) {
       onNavigateToConversation();
@@ -29,6 +30,14 @@ export function SentenceShare({ message, avatarUrl, onBack, onNavigateToConversa
   const handleDeselectAll = () => {
     setSelectedIndices(new Set());
   };
+
+  const handleComplete = () => {
+    if (selectedIndices.size > 0 && onComplete) {
+      onComplete(Array.from(selectedIndices).sort((a, b) => a - b));
+    }
+  };
+
+  const isSelectionComplete = selectedIndices.size > 0;
 
   return (
     <div className="flex flex-col h-screen bg-[#fdf6f6]">
@@ -58,6 +67,21 @@ export function SentenceShare({ message, avatarUrl, onBack, onNavigateToConversa
           selectedIndices={selectedIndices}
           onSelectionChange={setSelectedIndices}
         />
+      </div>
+
+      {/* 선택 완료 버튼 */}
+      <div className="p-4 bg-white border-t border-gray-100">
+        <button
+          onClick={handleComplete}
+          disabled={!isSelectionComplete}
+          className={`w-full py-3 rounded-xl text-white font-medium transition-colors ${
+            isSelectionComplete
+              ? 'bg-[#ff2e7f] hover:bg-[#e0266f]'
+              : 'bg-gray-300 cursor-not-allowed'
+          }`}
+        >
+          선택 완료
+        </button>
       </div>
     </div>
   );

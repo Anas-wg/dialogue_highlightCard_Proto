@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { ChatRoom } from './views/ChatRoom';
 import { SentenceShare } from './views/SentenceShare';
 import { ConversationShare } from './views/ConversationShare';
+import { MessageBalloonSelect } from './views/MessageBalloonSelect';
 import { ImageRender } from './views/ImageRender';
 import { mockChatRoom } from './mock/chatData';
 import type { ChatMessage } from './types/chat';
 
-type Screen = 'chatroom' | 'sentenceShare' | 'conversationShare' | 'imageRender';
+type Screen = 'chatroom' | 'sentenceShare' | 'conversationShare' | 'messageSelect' | 'imageRender';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('chatroom');
@@ -45,6 +46,10 @@ function App() {
         avatarUrl={mockChatRoom.character.avatarUrl}
         onBack={handleBackToChatRoom}
         onNavigateToConversation={() => setCurrentScreen('conversationShare')}
+        onComplete={(_selectedIndices) => {
+          // 추후 이 데이터를 ImageRender로 전달
+          setCurrentScreen('imageRender');
+        }}
       />
     );
   }
@@ -56,6 +61,22 @@ function App() {
         avatarUrl={mockChatRoom.character.avatarUrl}
         onBack={handleBackToChatRoom}
         onComplete={handleConversationComplete}
+        onNavigateToSentence={() => setCurrentScreen('messageSelect')}
+      />
+    );
+  }
+
+  if (currentScreen === 'messageSelect') {
+    return (
+      <MessageBalloonSelect
+        messages={mockChatRoom.messages}
+        avatarUrl={mockChatRoom.character.avatarUrl}
+        onBack={handleBackToChatRoom}
+        onSelectMessage={(message) => {
+          setSelectedMessage(message);
+          setCurrentScreen('sentenceShare');
+        }}
+        onNavigateToConversation={() => setCurrentScreen('conversationShare')}
       />
     );
   }
