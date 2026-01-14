@@ -172,11 +172,14 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
   const handleShareLink = async () => {
     if (!isConversationCard || currentCard.type !== 'conversation') return;
 
-    // sessionStorage에 저장
+    // localStorage에 저장
     saveShareData(currentCard.character, currentCard.messages);
 
-    // URL 생성 및 클립보드 복사
+    // URL 생성 및 새 탭에서 열기
     const url = createShareUrl();
+    window.open(url, '_blank');
+
+    // 클립보드에도 복사
     try {
       await navigator.clipboard.writeText(url);
       setLinkCopied(true);
