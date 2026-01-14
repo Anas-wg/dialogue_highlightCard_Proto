@@ -13,9 +13,28 @@ function formatTime(timestamp: string): string {
 
 export function ConversationCard({ character, messages }: ConversationCardProps) {
   return (
-    <div className="w-[1080px] h-[1080px] bg-[#fff8fa] flex flex-col overflow-hidden">
-      {/* 상단 로고 바 */}
-      <div className="shrink-0 px-10 py-6 border-b border-[#ff2e7f]/10">
+    <div className="w-[1080px] bg-[#fff8fa] flex flex-col">
+      {/* 상단: 캐릭터 정보 (좌측) + 로고 (우측) */}
+      <div className="shrink-0 px-10 py-6 border-b border-[#ff2e7f]/10 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#ff2e7f]/20">
+            {character.avatarUrl ? (
+              <img
+                src={character.avatarUrl}
+                alt={character.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-white flex items-center justify-center text-[#ff2e7f] font-medium">
+                {character.name[0]}
+              </div>
+            )}
+          </div>
+          <div>
+            <p className="font-semibold text-[#ff2e7f]">{character.name}</p>
+            <p className="text-sm text-[#ff2e7f]/50">LoveyDovey Character</p>
+          </div>
+        </div>
         <img
           src="/assets/Loveydovey_logo_real.svg"
           alt="LoveyDovey"
@@ -24,7 +43,7 @@ export function ConversationCard({ character, messages }: ConversationCardProps)
       </div>
 
       {/* 메시지 영역 */}
-      <div className="flex-1 px-12 py-8 space-y-8 overflow-hidden">
+      <div className="px-12 py-8 space-y-8">
         {messages.map((message) => {
           const isUser = message.sender === 'user';
           const isCharacter = message.sender === 'character';
@@ -72,32 +91,6 @@ export function ConversationCard({ character, messages }: ConversationCardProps)
 
           return null;
         })}
-      </div>
-
-      {/* 하단 캐릭터 정보 */}
-      <div className="shrink-0 px-10 py-6 border-t border-[#ff2e7f]/10 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#ff2e7f]/20">
-            {character.avatarUrl ? (
-              <img
-                src={character.avatarUrl}
-                alt={character.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-white flex items-center justify-center text-[#ff2e7f] font-medium">
-                {character.name[0]}
-              </div>
-            )}
-          </div>
-          <div>
-            <p className="font-semibold text-[#ff2e7f]">{character.name}</p>
-            <p className="text-sm text-[#ff2e7f]/50">LoveyDovey Character</p>
-          </div>
-        </div>
-        <div className="text-[#ff2e7f]/60 text-sm font-medium">
-          @lovey_dovey
-        </div>
       </div>
     </div>
   );

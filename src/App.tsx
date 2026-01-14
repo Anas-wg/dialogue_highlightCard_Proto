@@ -3,9 +3,7 @@ import { ChatRoom } from './views/ChatRoom';
 import { SentenceShare } from './views/SentenceShare';
 import { ConversationShare } from './views/ConversationShare';
 import { MessageBalloonSelect } from './views/MessageBalloonSelect';
-import { GridPreview } from './views/GridPreview';
 import { CarouselPreview } from './views/CarouselPreview';
-import { ShareModal } from './components/modal/ShareModal';
 import { mockChatRoom } from './mock/chatData';
 import { splitSentencesToCards, splitMessagesToCards } from './utils/cardSplitter';
 import type { ChatMessage } from './types/chat';
@@ -16,7 +14,6 @@ type Screen =
   | 'sentenceShare'
   | 'conversationShare'
   | 'messageSelect'
-  | 'gridPreview'
   | 'carouselPreview';
 
 function App() {
@@ -24,7 +21,6 @@ function App() {
   const [selectedMessage, setSelectedMessage] = useState<ChatMessage | null>(null);
   const [cards, setCards] = useState<CardData[]>([]);
   const [carouselIndex, setCarouselIndex] = useState(0);
-  const [showShareModal, setShowShareModal] = useState(false);
 
   const handleShareMessage = (messageId: string) => {
     const message = mockChatRoom.messages.find((m) => m.id === messageId);
@@ -58,7 +54,9 @@ function App() {
     }));
 
     setCards(cardDataList);
-    setCurrentScreen('gridPreview');
+    // 문장 공유도 바로 CarouselPreview로 이동
+    setCarouselIndex(0);
+    setCurrentScreen('carouselPreview');
   };
 
   const handleConversationComplete = (
@@ -72,7 +70,7 @@ function App() {
       filteredMessages = filteredMessages.filter((m) => m.sender !== 'user');
     }
 
-    // 메시지들을 카드별로 분할
+    // 메시지들을 단일 카드로 변환 (분할 없음)
     const splitCards = splitMessagesToCards(filteredMessages);
 
     // 각 분할된 그룹을 CardData로 변환
@@ -86,7 +84,9 @@ function App() {
     }));
 
     setCards(cardDataList);
-    setCurrentScreen('gridPreview');
+    // 대화 공유는 바로 CarouselPreview로 이동
+    setCarouselIndex(0);
+    setCurrentScreen('carouselPreview');
   };
 
   const handleBackToChatRoom = () => {
@@ -96,17 +96,16 @@ function App() {
     setCarouselIndex(0);
   };
 
-  const handleBackToGrid = () => {
-    setCurrentScreen('gridPreview');
+  // 대화 공유 CarouselPreview에서 뒤로가기
+  const handleBackFromConversationCarousel = () => {
+    setCurrentScreen('chatroom');
+    setCards([]);
   };
 
-  const handleCardTap = (index: number) => {
-    setCarouselIndex(index);
-    setCurrentScreen('carouselPreview');
-  };
-
-  const handleDownloadComplete = () => {
-    setShowShareModal(true);
+  // 문장 공유 CarouselPreview에서 뒤로가기 (SentenceShare로)
+  const handleBackFromSentenceCarousel = () => {
+    setCurrentScreen('sentenceShare');
+    setCards([]);
   };
 
   if (currentScreen === 'sentenceShare' && selectedMessage) {
@@ -148,30 +147,14 @@ function App() {
     );
   }
 
-  if (currentScreen === 'gridPreview' && cards.length > 0) {
-    return (
-      <>
-        <GridPreview
-          cards={cards}
-          onBack={handleBackToChatRoom}
-          onCardTap={handleCardTap}
-          onDownloadComplete={handleDownloadComplete}
-        />
-        <ShareModal
-          isOpen={showShareModal}
-          shareUrl={mockChatRoom.character.shareUrl || ''}
-          onClose={() => setShowShareModal(false)}
-        />
-      </>
-    );
-  }
-
   if (currentScreen === 'carouselPreview' && cards.length > 0) {
+    const isConversationCard = cards[0]?.type === 'conversation';
     return (
       <CarouselPreview
         cards={cards}
         initialIndex={carouselIndex}
-        onBack={handleBackToGrid}
+        onBack={isConversationCard ? handleBackFromConversationCarousel : handleBackFromSentenceCarousel}
+        onBackToHome={handleBackToChatRoom}
       />
     );
   }
