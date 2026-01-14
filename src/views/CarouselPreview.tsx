@@ -273,7 +273,7 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
           currentIndex={currentIndex}
           totalCount={cards.length}
           onBack={onBack}
-          backText={isConversationCard ? '채팅으로 돌아가기' : '다시 선택하기'}
+          backText="다시 선택하기"
           guideTitle={isConversationCard ? '이 대화로 공유할 하이라이트 카드입니다' : '공유할 하이라이트 카드를 확인하세요'}
           guideDescription={isConversationCard
             ? '선택한 대화 범위가 카드로 만들어졌어요.\n아래로 스크롤하면 전체 대화를 확인할 수 있어요.'
@@ -521,10 +521,10 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
         <div className={`flex items-center bg-white border-t border-gray-100 ${
           screenSize === 'mobile' ? 'justify-center px-4 py-3' : 'justify-between px-6 py-4'
         }`}>
-          {/* 좌측: 채팅으로 돌아가기 버튼 (문장 카드만, 모바일에서 숨김) */}
+          {/* 좌측: 채팅으로 돌아가기 버튼 (모바일에서 숨김) */}
           {screenSize !== 'mobile' && (
             <div>
-              {isSentenceCard && onBackToHome && (
+              {onBackToHome && (
                 <button
                   onClick={onBackToHome}
                   className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"

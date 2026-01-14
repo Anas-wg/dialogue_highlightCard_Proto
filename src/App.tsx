@@ -135,9 +135,9 @@ function App() {
     setCarouselIndex(0);
   };
 
-  // 대화 공유 CarouselPreview에서 뒤로가기
+  // 대화 공유 CarouselPreview에서 뒤로가기 (재선택)
   const handleBackFromConversationCarousel = () => {
-    setCurrentScreen('chatroom');
+    setCurrentScreen('conversationShare');
     setCards([]);
   };
 
