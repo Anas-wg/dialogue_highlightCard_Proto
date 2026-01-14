@@ -99,6 +99,35 @@ function App() {
     setCurrentScreen('carouselPreview');
   };
 
+  // 개별 선택 모드로 대화 공유 완료
+  const handleConversationCompleteIndividual = (
+    selectedIndices: number[],
+    hideMyMessages: boolean
+  ) => {
+    // 선택된 인덱스의 메시지들만 추출
+    let filteredMessages = selectedIndices.map((i) => mockChatRoom.messages[i]);
+
+    if (hideMyMessages) {
+      filteredMessages = filteredMessages.filter((m) => m.sender !== 'user');
+    }
+
+    // 메시지들을 단일 카드로 변환
+    const splitCards = splitMessagesToCards(filteredMessages);
+
+    const cardDataList: CardData[] = splitCards.map((cardMessages) => ({
+      type: 'conversation',
+      character: {
+        name: mockChatRoom.character.name,
+        avatarUrl: mockChatRoom.character.avatarUrl,
+      },
+      messages: cardMessages,
+    }));
+
+    setCards(cardDataList);
+    setCarouselIndex(0);
+    setCurrentScreen('carouselPreview');
+  };
+
   const handleBackToChatRoom = () => {
     setCurrentScreen('chatroom');
     setSelectedMessage(null);
@@ -142,6 +171,7 @@ function App() {
         avatarUrl={mockChatRoom.character.avatarUrl}
         onBack={handleBackToChatRoom}
         onComplete={handleConversationComplete}
+        onCompleteIndividual={handleConversationCompleteIndividual}
         onNavigateToSentence={() => setCurrentScreen('messageSelect')}
       />
     );
