@@ -76,9 +76,9 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
   // 키보드 방향키 네비게이션
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
         setCurrentIndex((prev) => Math.max(0, prev - 1));
-      } else if (e.key === 'ArrowRight') {
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         setCurrentIndex((prev) => Math.min(cards.length - 1, prev + 1));
       }
     };
@@ -86,6 +86,30 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [cards.length]);
+
+  // 문장 카드: 휠 스크롤로 카드 전환
+  const handleWheel = useCallback((e: WheelEvent) => {
+    if (!isSentenceCard || cards.length <= 1) return;
+
+    e.preventDefault();
+
+    if (e.deltaY > 0) {
+      // 아래로 스크롤 → 다음 카드
+      setCurrentIndex((prev) => Math.min(cards.length - 1, prev + 1));
+    } else if (e.deltaY < 0) {
+      // 위로 스크롤 → 이전 카드
+      setCurrentIndex((prev) => Math.max(0, prev - 1));
+    }
+  }, [isSentenceCard, cards.length]);
+
+  // 휠 이벤트 등록 (문장 카드용)
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container && isSentenceCard) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      return () => container.removeEventListener('wheel', handleWheel);
+    }
+  }, [handleWheel, isSentenceCard]);
 
   const goToPrev = () => {
     if (currentIndex > 0) {
@@ -157,6 +181,7 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
           currentIndex={currentIndex}
           totalCount={cards.length}
           onBack={onBack}
+          backText={isConversationCard ? '채팅으로 돌아가기' : '다시 선택하기'}
         />
 
         {/* 메인 컨텐츠 영역 */}
@@ -335,9 +360,9 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
 
         {/* 하단 버튼 영역 */}
         <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-100">
-          {/* 좌측: 채팅으로 돌아가기 버튼 */}
+          {/* 좌측: 채팅으로 돌아가기 버튼 (문장 카드만) */}
           <div>
-            {onBackToHome && (
+            {isSentenceCard && onBackToHome && (
               <button
                 onClick={onBackToHome}
                 className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"

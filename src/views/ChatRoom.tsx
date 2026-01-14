@@ -41,6 +41,7 @@ export function ChatRoom({ data, onShareMessage, onCreateCard }: ChatRoomProps) 
         <ChatHeader
           characterName={data.character.name}
           coins={data.coins}
+          onShare={onCreateCard}
           onMenu={() => setIsMenuOpen(true)}
         />
 
