@@ -205,6 +205,11 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
           totalCount={cards.length}
           onBack={onBack}
           backText={isConversationCard ? '채팅으로 돌아가기' : '다시 선택하기'}
+          guideTitle={isConversationCard ? '이 대화로 공유할 하이라이트 카드입니다' : '공유할 하이라이트 카드를 확인하세요'}
+          guideDescription={isConversationCard
+            ? '선택한 대화 범위가 카드로 만들어졌어요.\n아래로 스크롤하면 전체 대화를 확인할 수 있어요.'
+            : '선택한 문장으로 카드가 만들어졌어요.'
+          }
         />
 
         {/* 메인 컨텐츠 영역 */}

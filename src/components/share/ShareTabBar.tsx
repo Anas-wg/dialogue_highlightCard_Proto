@@ -22,13 +22,9 @@ export function ShareTabBar({ activeTab, onTabChange }: ShareTabBarProps) {
         className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
           activeTab === 'conversation'
             ? 'text-white'
-            : 'bg-white'
+            : 'text-gray-400 bg-white'
         }`}
-        style={
-          activeTab === 'conversation'
-            ? { backgroundColor: '#ff2e7f' }
-            : { color: '#ff2e7f' }
-        }
+        style={activeTab === 'conversation' ? { backgroundColor: '#ff2e7f' } : undefined}
       >
         대화 공유하기
       </button>

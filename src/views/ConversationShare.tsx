@@ -119,9 +119,10 @@ export function ConversationShare({
       {/* 안내 텍스트 */}
       <div className="py-8 text-center text-sm text-gray-500">
         <p>***</p>
-        <p className="mt-2 font-medium text-gray-700">시작 말풍선과 종료 말풍선을 선택하세요.</p>
-        <p className="mt-1">전체 대화를 공유하고 싶다면, 우측 상단 전체 선택 버튼을 눌러주세요.</p>
-        <p>특정 문장만 공유하고 싶다면, <span className="font-bold">상단의 문장 공유하기</span>를 눌러주세요</p>
+        <p className="mt-2 font-medium text-gray-700">공유할 대화의 시작과 끝을 순서대로 선택하세요.</p>
+        <p className="mt-1 text-gray-500">먼저 시작 말풍선을, 다음으로 종료 말풍선을 선택해요.</p>
+        <p className="mt-4">전체 대화를 공유하려면 우측 상단의 <span className="font-bold">'전체 선택'</span>을 누르세요.</p>
+        <p className="mt-1">일부 문장만 공유하려면 상단의 <span className="font-bold">'문장 공유하기'</span>를 선택하세요.</p>
         <p className="mt-2">***</p>
       </div>
 
