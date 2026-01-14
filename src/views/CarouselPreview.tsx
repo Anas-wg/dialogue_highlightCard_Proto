@@ -404,28 +404,31 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
           </div>
 
           {/* 중앙: 공유/다운로드 버튼 */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-6">
             {/* 링크 공유 버튼 (대화 카드만) */}
             {isConversationCard && (
-              <button
-                onClick={handleShareLink}
-                className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-                  linkCopied
-                    ? 'bg-green-500 text-white'
-                    : 'bg-[#ff2e7f] text-white hover:bg-[#e0266f]'
-                }`}
-              >
-                {linkCopied ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                  </svg>
-                )}
-              </button>
+              <div className="flex flex-col items-center gap-1">
+                <button
+                  onClick={handleShareLink}
+                  className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                    linkCopied
+                      ? 'bg-green-500 text-white'
+                      : 'bg-[#ff2e7f] text-white hover:bg-[#e0266f]'
+                  }`}
+                >
+                  {linkCopied ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                    </svg>
+                  )}
+                </button>
+                <span className="text-xs text-gray-500">공유하기</span>
+              </div>
             )}
 
             <button
@@ -437,22 +440,25 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
               </svg>
             </button>
 
-            <button
-              onClick={isSentenceCard && selectedIndices.size > 0 ? handleBatchDownload : handleDownload}
-              className="relative w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#ff2e7f] hover:bg-gray-100 transition-colors"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              {/* 선택된 카드 수 표시 */}
-              {isSentenceCard && selectedIndices.size > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff2e7f] text-white text-xs rounded-full flex items-center justify-center">
-                  {selectedIndices.size}
-                </span>
-              )}
-            </button>
+            <div className="flex flex-col items-center gap-1">
+              <button
+                onClick={isSentenceCard && selectedIndices.size > 0 ? handleBatchDownload : handleDownload}
+                className="relative w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#ff2e7f] hover:bg-gray-100 transition-colors"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                {/* 선택된 카드 수 표시 */}
+                {isSentenceCard && selectedIndices.size > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff2e7f] text-white text-xs rounded-full flex items-center justify-center">
+                    {selectedIndices.size}
+                  </span>
+                )}
+              </button>
+              <span className="text-xs text-gray-500">저장하기</span>
+            </div>
           </div>
 
           {/* 우측: 빈 공간 (균형) */}
