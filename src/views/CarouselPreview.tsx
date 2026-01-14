@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, TouchEvent } from 'react';
+import { useState, useRef, useEffect, useCallback, type TouchEvent } from 'react';
 import { CarouselHeader } from '../components/card/CarouselHeader';
 import { SentenceCard } from '../components/card/SentenceCard';
 import { ConversationCard } from '../components/card/ConversationCard';
@@ -392,7 +392,26 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
             </div>
           )}
 
-          {/* 우측: 스크롤 가능한 카드 미리보기 */}
+          {/* 데스크톱: 좌측 화살표 */}
+          {screenSize === 'desktop' && cards.length > 1 && (
+            <div className="shrink-0 flex items-center px-2">
+              <button
+                onClick={goToPrev}
+                disabled={currentIndex === 0}
+                className={`p-3 rounded-full transition-colors ${
+                  currentIndex === 0
+                    ? 'text-gray-200 cursor-not-allowed'
+                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* 중앙: 스크롤 가능한 카드 미리보기 */}
           <div
             ref={scrollContainerRef}
             onScroll={handleScroll}
@@ -429,23 +448,46 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
               </div>
             </div>
           </div>
+
+          {/* 데스크톱: 우측 화살표 */}
+          {screenSize === 'desktop' && cards.length > 1 && (
+            <div className="shrink-0 flex items-center px-2">
+              <button
+                onClick={goToNext}
+                disabled={currentIndex === cards.length - 1}
+                className={`p-3 rounded-full transition-colors ${
+                  currentIndex === cards.length - 1
+                    ? 'text-gray-200 cursor-not-allowed'
+                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 네비게이션 (카드가 여러 개일 때만) */}
         {cards.length > 1 && (
           <div className="flex items-center justify-center gap-8 py-3 border-t border-gray-100">
-            <button
-              onClick={goToPrev}
-              disabled={currentIndex === 0}
-              className={`p-2 rounded-full transition-colors ${
-                currentIndex === 0 ? 'text-gray-300' : 'text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-            </button>
+            {/* 모바일/태블릿: 좌측 화살표 */}
+            {screenSize !== 'desktop' && (
+              <button
+                onClick={goToPrev}
+                disabled={currentIndex === 0}
+                className={`p-2 rounded-full transition-colors ${
+                  currentIndex === 0 ? 'text-gray-300' : 'text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+            )}
 
+            {/* Dot 인디케이터 (모든 화면) */}
             <div className="flex gap-2">
               {cards.map((_, index) => (
                 <button
@@ -458,17 +500,20 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
               ))}
             </div>
 
-            <button
-              onClick={goToNext}
-              disabled={currentIndex === cards.length - 1}
-              className={`p-2 rounded-full transition-colors ${
-                currentIndex === cards.length - 1 ? 'text-gray-300' : 'text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
+            {/* 모바일/태블릿: 우측 화살표 */}
+            {screenSize !== 'desktop' && (
+              <button
+                onClick={goToNext}
+                disabled={currentIndex === cards.length - 1}
+                className={`p-2 rounded-full transition-colors ${
+                  currentIndex === cards.length - 1 ? 'text-gray-300' : 'text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            )}
           </div>
         )}
 
