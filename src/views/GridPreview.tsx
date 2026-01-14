@@ -83,13 +83,11 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
       />
 
       {/* 안내 문구 */}
-      <div className="py-4 text-center">
-        <p className="text-[#ff2e7f] font-medium">
-          생성된 전체 대화 하이라이트 카드를 확인하세요
-        </p>
-        <p className="text-[#ff2e7f]/70 text-sm mt-1">
-          우클릭으로 다운로드할 사진을 선택할 수 있습니다.
-        </p>
+      <div className="py-8 text-center text-sm text-gray-500">
+        <p>***</p>
+        <p className="mt-2 font-medium text-gray-700">생성된 전체 대화 하이라이트 카드를 확인하세요.</p>
+        <p className="mt-1">다운로드할 카드의 체크 버튼을 누른 후, 상단의 다운로드 버튼을 눌러주세요.</p>
+        <p className="mt-2">***</p>
       </div>
 
       {/* 그리드 */}
@@ -135,14 +133,22 @@ export function GridPreview({ cards, onBack, onCardTap, onDownloadComplete }: Gr
                 </div>
               </div>
 
-              {/* 선택 체크 표시 */}
-              {selectedIndices.has(index) && (
-                <div className="absolute top-2 right-2 w-6 h-6 bg-[#ff2e7f] rounded-full flex items-center justify-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </div>
-              )}
+              {/* 선택 체크 버튼 */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleSelection(index);
+                }}
+                className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                  selectedIndices.has(index)
+                    ? 'bg-[#ff2e7f]'
+                    : 'bg-gray-300'
+                }`}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </button>
             </div>
           ))}
         </div>
