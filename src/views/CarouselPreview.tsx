@@ -3,6 +3,7 @@ import { CarouselHeader } from '../components/card/CarouselHeader';
 import { SentenceCard } from '../components/card/SentenceCard';
 import { ConversationCard } from '../components/card/ConversationCard';
 import { useImageGenerator } from '../hooks/useImageGenerator';
+import { saveShareData, createShareUrl } from '../utils/shareStorage';
 import type { CardData } from '../types/card';
 
 interface CarouselPreviewProps {
@@ -163,6 +164,25 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
       const encodedUrl = encodeURIComponent(shareUrl || 'https://www.loveydovey.ai');
       const url = `https://x.com/intent/post?text=${encodedText}&url=${encodedUrl}`;
       window.open(url, '_blank', 'width=600,height=400');
+    }
+  };
+
+  // 웹 공유 링크 생성 (대화 카드만)
+  const [linkCopied, setLinkCopied] = useState(false);
+  const handleShareLink = async () => {
+    if (!isConversationCard || currentCard.type !== 'conversation') return;
+
+    // sessionStorage에 저장
+    saveShareData(currentCard.character, currentCard.messages);
+
+    // URL 생성 및 클립보드 복사
+    const url = createShareUrl();
+    try {
+      await navigator.clipboard.writeText(url);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch (err) {
+      console.error('클립보드 복사 실패:', err);
     }
   };
 
@@ -377,6 +397,29 @@ export function CarouselPreview({ cards, initialIndex, onBack, onBackToHome }: C
 
           {/* 중앙: 공유/다운로드 버튼 */}
           <div className="flex items-center gap-4">
+            {/* 링크 공유 버튼 (대화 카드만) */}
+            {isConversationCard && (
+              <button
+                onClick={handleShareLink}
+                className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+                  linkCopied
+                    ? 'bg-green-500 text-white'
+                    : 'bg-[#ff2e7f] text-white hover:bg-[#e0266f]'
+                }`}
+              >
+                {linkCopied ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                  </svg>
+                )}
+              </button>
+            )}
+
             <button
               onClick={() => handleShare('twitter')}
               className="w-12 h-12 rounded-full bg-black flex items-center justify-center text-white"

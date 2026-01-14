@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChatRoom } from './views/ChatRoom';
 import { SentenceShare } from './views/SentenceShare';
 import { ConversationShare } from './views/ConversationShare';
 import { MessageBalloonSelect } from './views/MessageBalloonSelect';
 import { CarouselPreview } from './views/CarouselPreview';
+import { SharePage } from './views/SharePage';
 import { mockChatRoom } from './mock/chatData';
 import { splitSentencesToCards, splitMessagesToCards } from './utils/cardSplitter';
 import type { ChatMessage } from './types/chat';
@@ -21,6 +22,15 @@ function App() {
   const [selectedMessage, setSelectedMessage] = useState<ChatMessage | null>(null);
   const [cards, setCards] = useState<CardData[]>([]);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [isSharePage, setIsSharePage] = useState(false);
+
+  // URL 파라미터 감지: ?share=true
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('share') === 'true') {
+      setIsSharePage(true);
+    }
+  }, []);
 
   const handleShareMessage = (messageId: string) => {
     const message = mockChatRoom.messages.find((m) => m.id === messageId);
@@ -107,6 +117,11 @@ function App() {
     setCurrentScreen('sentenceShare');
     setCards([]);
   };
+
+  // 공유 페이지 (URL 파라미터로 진입)
+  if (isSharePage) {
+    return <SharePage />;
+  }
 
   if (currentScreen === 'sentenceShare' && selectedMessage) {
     return (
