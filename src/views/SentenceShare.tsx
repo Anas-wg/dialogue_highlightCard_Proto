@@ -54,7 +54,7 @@ export function SentenceShare({ message, avatarUrl, onBack, onNavigateToConversa
       {/* 안내 텍스트 */}
       <div className="py-8 text-center text-sm text-gray-500">
         <p>***</p>
-        <p className="mt-2 font-medium text-gray-700">공유하고 싶은 문장을 하나 이상 탭하세요.</p>
+        <p className="mt-2 font-medium text-gray-700">공유하고 싶은 문장을 하나 이상 클릭하세요.</p>
         <p className="mt-1 text-gray-500">이 말풍선 안에서 여러 문장을 선택할 수 있어요.</p>
         <p className="mt-4">여러 말풍선을 함께 공유하려면</p>
         <p className="mt-1">상단의 <span className="font-bold">'대화 공유하기'</span>를 선택하세요.</p>
