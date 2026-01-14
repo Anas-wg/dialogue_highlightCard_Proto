@@ -16,12 +16,6 @@ const AVATAR_ROW_HEIGHT = 40;        // 아바타 + 이름 높이 (w-16 + text-l
 const MAX_SENTENCE_CHARS = 350;      // 문장 최대 글자 수 (카드 1장에 들어갈 수 있는 크기)
 
 // ============ ConversationCard 상수 (Design D) ============
-const CONV_HEADER_HEIGHT = 56;       // 로고 바 실측
-const CONV_FOOTER_HEIGHT = 72;       // 캐릭터 정보 실측
-const CONV_PADDING = 64;             // 메시지 영역 py-8 = 32px * 2
-const CONV_SAFETY_MARGIN = 80;       // 안전 마진 (오버플로우 방지)
-const CONV_CONTENT_HEIGHT = CARD_HEIGHT - CONV_HEADER_HEIGHT - CONV_FOOTER_HEIGHT - CONV_PADDING - CONV_SAFETY_MARGIN; // ≈ 808px
-
 const CONV_CHARS_PER_LINE = 32;      // 실제 말풍선 너비 기준
 const CONV_LINE_HEIGHT = 28;         // text-xl 실측
 const CONV_MESSAGE_GAP = 32;         // space-y-8
@@ -128,78 +122,6 @@ export function estimateMessageHeight(message: ChatMessage): number {
     // 캐릭터 메시지: 이름 + 말풍선 + 시간 + 간격
     return CHAR_NAME_HEIGHT + textHeight + CHAR_BUBBLE_PADDING + CHAR_TIME_HEIGHT + CONV_MESSAGE_GAP;
   }
-}
-
-/**
- * 메시지의 보이는 줄 수 계산
- */
-function getVisibleLines(message: ChatMessage, availableHeight: number): number {
-  const baseHeight = message.sender === 'user'
-    ? USER_BUBBLE_PADDING + USER_TIME_HEIGHT + CONV_MESSAGE_GAP
-    : CHAR_NAME_HEIGHT + CHAR_BUBBLE_PADDING + CHAR_TIME_HEIGHT + CONV_MESSAGE_GAP;
-
-  const textAvailableHeight = availableHeight - baseHeight;
-  if (textAvailableHeight <= 0) return 0;
-
-  return Math.floor(textAvailableHeight / CONV_LINE_HEIGHT);
-}
-
-/**
- * 메시지를 특정 줄에서 분할 (실제 라인 기준)
- */
-function splitMessageAtLine(msg: ChatMessage, visibleLines: number): { visible: ChatMessage; remaining: ChatMessage | null } {
-  const contentLines = msg.content.split('\n');
-  const visibleContentLines: string[] = [];
-  const remainingContentLines: string[] = [];
-  let currentLineCount = 0;
-  let splitOccurred = false;
-
-  for (let i = 0; i < contentLines.length; i++) {
-    const line = contentLines[i];
-
-    if (splitOccurred) {
-      // 이미 분할이 발생했으면 나머지는 모두 remaining으로
-      remainingContentLines.push(line);
-      continue;
-    }
-
-    const lineWraps = line.length === 0 ? 1 : Math.ceil(line.length / CONV_CHARS_PER_LINE);
-
-    if (currentLineCount + lineWraps <= visibleLines) {
-      // 이 줄 전체가 보임
-      visibleContentLines.push(line);
-      currentLineCount += lineWraps;
-    } else {
-      // 이 줄에서 일부만 보임 - 글자 수로 분할
-      const remainingVisibleLines = visibleLines - currentLineCount;
-      if (remainingVisibleLines > 0) {
-        const visibleChars = remainingVisibleLines * CONV_CHARS_PER_LINE;
-        visibleContentLines.push(line.slice(0, visibleChars));
-        // 나머지 글자는 remaining으로
-        const restOfLine = line.slice(visibleChars);
-        if (restOfLine) {
-          remainingContentLines.push(restOfLine);
-        }
-      } else {
-        // 공간이 없으면 전체 줄을 remaining으로
-        remainingContentLines.push(line);
-      }
-      splitOccurred = true;
-      // 나머지 줄들은 다음 iteration에서 추가됨
-    }
-  }
-
-  const visibleContent = visibleContentLines.join('\n').trim();
-  const remainingContent = remainingContentLines.join('\n').trim();
-
-  if (!remainingContent) {
-    return { visible: msg, remaining: null };
-  }
-
-  return {
-    visible: { ...msg, content: visibleContent },
-    remaining: { ...msg, content: remainingContent, id: `${msg.id}_cont` }
-  };
 }
 
 /**
