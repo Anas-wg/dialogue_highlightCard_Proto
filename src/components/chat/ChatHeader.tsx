@@ -19,13 +19,14 @@ export function ChatHeader({ characterName, coins, onBack, onShare, onMenu }: Ch
         </svg>
       </button>
 
-      <div className="flex items-center gap-4">
-        <span className="font-medium text-gray-800">
-          {characterName} <span className="text-[#ff2e7f]">✦</span> &gt;
-        </span>
-      </div>
-
       <div className="flex items-center gap-2">
+        {/* 캐릭터 이름 버튼 */}
+        <button className="flex items-center gap-1 px-3 py-1 rounded-full border border-gray-200 text-gray-800 hover:bg-gray-50 transition-colors">
+          <span className="font-medium">{characterName}</span>
+          <span className="text-[#ff2e7f]">✦</span>
+          <span className="text-gray-400">&gt;</span>
+        </button>
+        {/* 코인 버튼 */}
         <div className="flex items-center gap-1 px-3 py-1 rounded-full border border-[#ff2e7f] text-[#ff2e7f]">
           <span className="font-medium">{coins.toLocaleString()}</span>
           <span>🪙</span>
