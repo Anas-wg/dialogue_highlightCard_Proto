@@ -132,9 +132,35 @@ export function SharePage() {
           </div>
         </div>
 
-        {/* 하단: CTA 버튼 (2개) */}
-        <div className="p-4 bg-white border-t border-gray-100">
-          <div className="flex gap-3">
+        {/* 하단: 가짜 채팅 입력 + CTA 버튼 */}
+        <div className="bg-white border-t border-gray-100">
+          {/* 가짜 채팅 입력 UI */}
+          <div
+            onClick={handleCTAClick}
+            className="px-4 py-3 border-b border-gray-100 cursor-pointer"
+          >
+            <div className="flex items-center gap-2 px-4 py-3 bg-gray-100 rounded-full">
+              <input
+                type="text"
+                placeholder={`${shareData.character.name}에게 메시지 보내기...`}
+                className="flex-1 bg-transparent text-sm text-gray-500 outline-none cursor-pointer"
+                onClick={handleCTAClick}
+                onFocus={(e) => {
+                  e.preventDefault();
+                  e.target.blur();
+                  handleCTAClick();
+                }}
+                readOnly
+              />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff2e7f" strokeWidth="2">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </div>
+          </div>
+
+          {/* CTA 버튼 */}
+          <div className="p-4 flex gap-3">
             <button
               onClick={() => window.open(APP_LINK_URL, '_blank')}
               className="flex-1 py-3 bg-white text-gray-700 rounded-full font-medium border border-gray-200 hover:bg-gray-50 transition-colors"
