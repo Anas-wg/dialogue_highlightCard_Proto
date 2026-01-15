@@ -6,14 +6,13 @@ import { useImageGenerator } from '../hooks/useImageGenerator';
 import { saveShareData, createShareUrl } from '../utils/shareStorage';
 import { mockCurrentUser } from '../mock/userData';
 import type { ChatMessage } from '../types/chat';
-import type { CardData } from '../types/card';
 
 interface ConversationShareProps {
   messages: ChatMessage[];
   avatarUrl?: string;
   characterName: string;
   onBack: () => void;
-  onComplete: (cardData: CardData) => void;
+  onComplete: () => void;
 }
 
 export function ConversationShare({
@@ -79,16 +78,7 @@ export function ConversationShare({
 
     try {
       const filteredMessages = getFilteredMessages();
-
-      // 카드 데이터 생성
-      const cardData: CardData = {
-        type: 'conversation',
-        character: {
-          name: characterName,
-          avatarUrl,
-        },
-        messages: filteredMessages,
-      };
+      const character = { name: characterName, avatarUrl };
 
       // 약간의 딜레이 후 이미지 생성 (렌더링 대기)
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -102,12 +92,12 @@ export function ConversationShare({
       }
 
       // localStorage에 저장하고 새 탭에서 공유 페이지 열기
-      saveShareData(cardData.character, cardData.messages, mockCurrentUser.id);
+      saveShareData(character, filteredMessages, mockCurrentUser.id);
       const shareUrl = createShareUrl();
       window.open(shareUrl, '_blank');
 
-      // 완료 콜백 (모달 표시 및 CarouselPreview 데이터 전달)
-      onComplete(cardData);
+      // 완료 콜백 (모달 표시)
+      onComplete();
     } finally {
       setIsProcessing(false);
     }

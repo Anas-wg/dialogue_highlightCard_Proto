@@ -2,10 +2,10 @@ interface CompletionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBackToChat: () => void;
-  onViewResult: () => void;
+  onReselect: () => void;
 }
 
-export function CompletionModal({ isOpen, onClose, onBackToChat, onViewResult }: CompletionModalProps) {
+export function CompletionModal({ isOpen, onClose, onBackToChat, onReselect }: CompletionModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -41,10 +41,10 @@ export function CompletionModal({ isOpen, onClose, onBackToChat, onViewResult }:
         {/* 버튼 영역 */}
         <div className="space-y-3">
           <button
-            onClick={onViewResult}
+            onClick={onReselect}
             className="w-full py-3 bg-[#ff2e7f] text-white font-medium rounded-xl hover:bg-[#e0266f] transition-colors"
           >
-            결과물 보기
+            다시 선택하기
           </button>
           <button
             onClick={onBackToChat}

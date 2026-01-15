@@ -1,21 +1,14 @@
 import { useState, useEffect } from 'react';
 import { ChatRoom } from './views/ChatRoom';
 import { ConversationShare } from './views/ConversationShare';
-import { Preview } from './views/Preview';
 import { SharePage } from './views/SharePage';
 import { CompletionModal } from './components/modal/CompletionModal';
 import { mockChatRoom } from './mock/chatData';
-import type { CardData } from './types/card';
 
-type Screen =
-  | 'chatroom'
-  | 'conversationShare'
-  | 'preview';
+type Screen = 'chatroom' | 'conversationShare';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('chatroom');
-  const [cards, setCards] = useState<CardData[]>([]);
-  const [carouselIndex, setCarouselIndex] = useState(0);
   const [isSharePage, setIsSharePage] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
@@ -36,29 +29,19 @@ function App() {
   };
 
   // ConversationShare에서 이미지 생성/저장/공유 완료 후 호출
-  const handleConversationComplete = (cardData: CardData) => {
-    setCards([cardData]);
-    setCarouselIndex(0);
+  const handleConversationComplete = () => {
     setShowCompletionModal(true);
   };
 
   const handleBackToChatRoom = () => {
     setCurrentScreen('chatroom');
-    setCards([]);
-    setCarouselIndex(0);
     setShowCompletionModal(false);
   };
 
-  // CarouselPreview에서 뒤로가기 (재선택)
-  const handleBackFromCarousel = () => {
-    setCurrentScreen('conversationShare');
-    setCards([]);
-  };
-
-  // 모달에서 "결과물 보기" 클릭
-  const handleViewResult = () => {
+  // 모달에서 "다시 선택하기" 클릭
+  const handleReselect = () => {
     setShowCompletionModal(false);
-    setCurrentScreen('preview');
+    // conversationShare 화면에 그대로 남아있음
   };
 
   // 공유 페이지 (URL 파라미터로 진입)
@@ -80,20 +63,9 @@ function App() {
           isOpen={showCompletionModal}
           onClose={() => setShowCompletionModal(false)}
           onBackToChat={handleBackToChatRoom}
-          onViewResult={handleViewResult}
+          onReselect={handleReselect}
         />
       </>
-    );
-  }
-
-  if (currentScreen === 'preview' && cards.length > 0) {
-    return (
-      <Preview
-        cards={cards}
-        initialIndex={carouselIndex}
-        onBack={handleBackFromCarousel}
-        onBackToHome={handleBackToChatRoom}
-      />
     );
   }
 
