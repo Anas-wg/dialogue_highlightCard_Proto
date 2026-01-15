@@ -1,6 +1,7 @@
 // 웹 공유 페이지 - ChatRoom UI 스타일
 import { useState, useEffect } from 'react';
-import { loadShareData, type ShareData } from '../utils/shareStorage';
+import { loadShareData, deleteShareData, type ShareData } from '../utils/shareStorage';
+import { mockCurrentUser } from '../mock/userData';
 import type { ChatMessage } from '../types/chat';
 
 const CTA_URL = 'https://www.loveydovey.ai/characters/CMC392geRGBX3nGWq8LX';
@@ -56,6 +57,7 @@ function ShareMessage({ message, characterName }: { message: ChatMessage; charac
 export function SharePage() {
   const [shareData, setShareData] = useState<ShareData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isDeleted, setIsDeleted] = useState(false);
 
   // localStorage에서 데이터 로드
   useEffect(() => {
@@ -68,10 +70,47 @@ export function SharePage() {
     window.open(CTA_URL, '_blank');
   };
 
+  const handleDeleteShare = () => {
+    const success = deleteShareData(mockCurrentUser.id);
+    if (success) {
+      setIsDeleted(true);
+      setShareData(null);
+    }
+  };
+
+  // 현재 사용자가 작성자인지 확인
+  const isCreator = shareData?.creatorId === mockCurrentUser.id;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#fdf6f6] flex items-center justify-center">
         <div className="text-gray-500">로딩 중...</div>
+      </div>
+    );
+  }
+
+  // 공유가 취소된 경우
+  if (isDeleted) {
+    return (
+      <div className="min-h-screen bg-[#fdf6f6] flex flex-col items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-200 flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <h1 className="text-xl font-medium text-gray-700 mb-2">공유가 취소되었습니다</h1>
+          <p className="text-gray-500 mb-6">
+            이 공유 링크는 더 이상<br />
+            사용할 수 없습니다.
+          </p>
+          <button
+            onClick={() => window.close()}
+            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition-colors"
+          >
+            탭 닫기
+          </button>
+        </div>
       </div>
     );
   }
@@ -107,7 +146,8 @@ export function SharePage() {
     <div className="h-screen bg-white">
       <div className="flex flex-col h-full max-w-[80%] mx-auto bg-[#fdf6f6]">
         {/* 상단: 캐릭터 정보 헤더 */}
-        <header className="flex items-center justify-center px-4 py-3 bg-white border-b border-gray-100">
+        <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
+          <div className="w-20" /> {/* 균형용 빈 공간 */}
           <div className="flex items-center gap-3">
             {/* 회색 원 아바타 (프로토타입) */}
             <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-white font-medium">
@@ -116,6 +156,17 @@ export function SharePage() {
             <span className="font-medium text-gray-800">
               {shareData.character.name} <span className="text-[#ff2e7f]">✦</span>
             </span>
+          </div>
+          {/* 공유 취소 버튼 (작성자만 표시) */}
+          <div className="w-20 flex justify-end">
+            {isCreator && (
+              <button
+                onClick={handleDeleteShare}
+                className="text-sm text-gray-400 hover:text-red-500 transition-colors"
+              >
+                공유 취소
+              </button>
+            )}
           </div>
         </header>
 

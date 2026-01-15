@@ -12,6 +12,7 @@ export interface ShareData {
   };
   messages: ChatMessage[];
   createdAt: number;
+  creatorId: string;
 }
 
 /**
@@ -19,12 +20,14 @@ export interface ShareData {
  */
 export function saveShareData(
   character: { name: string; avatarUrl?: string },
-  messages: ChatMessage[]
+  messages: ChatMessage[],
+  creatorId: string
 ): void {
   const data: ShareData = {
     character,
     messages,
     createdAt: Date.now(),
+    creatorId,
   };
 
   localStorage.setItem(SHARE_STORAGE_KEY, JSON.stringify(data));
@@ -53,6 +56,26 @@ export function loadShareData(): ShareData | null {
  */
 export function clearShareData(): void {
   localStorage.removeItem(SHARE_STORAGE_KEY);
+}
+
+/**
+ * 공유 데이터 삭제 (취소)
+ * @returns 삭제 성공 여부
+ */
+export function deleteShareData(currentUserId: string): boolean {
+  const data = loadShareData();
+
+  if (!data) {
+    return false;
+  }
+
+  // 작성자만 삭제 가능
+  if (data.creatorId !== currentUserId) {
+    return false;
+  }
+
+  clearShareData();
+  return true;
 }
 
 /**

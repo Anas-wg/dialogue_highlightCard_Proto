@@ -1,4 +1,4 @@
-interface CarouselHeaderProps {
+interface PreviewHeaderProps {
   currentIndex: number;
   totalCount: number;
   onBack: () => void;
@@ -8,7 +8,7 @@ interface CarouselHeaderProps {
   screenSize?: 'mobile' | 'tablet' | 'desktop';
 }
 
-export function CarouselHeader({
+export function PreviewHeader({
   currentIndex,
   totalCount,
   onBack,
@@ -16,7 +16,7 @@ export function CarouselHeader({
   guideTitle = '공유할 하이라이트 카드를 확인하세요',
   guideDescription,
   screenSize = 'desktop',
-}: CarouselHeaderProps) {
+}: PreviewHeaderProps) {
   const isMobile = screenSize === 'mobile';
 
   return (

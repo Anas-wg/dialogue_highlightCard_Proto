@@ -1,10 +1,4 @@
-import type { ChatMessage, CharacterInfo } from './chat';
-
-export interface SentenceCardData {
-  type: 'sentence';
-  character: CharacterInfo;
-  sentences: string[];
-}
+import type { ChatMessage } from './chat';
 
 export interface ConversationCardData {
   type: 'conversation';
@@ -12,4 +6,4 @@ export interface ConversationCardData {
   messages: ChatMessage[];
 }
 
-export type CardData = SentenceCardData | ConversationCardData;
+export type CardData = ConversationCardData;
